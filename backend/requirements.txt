@@ -1,0 +1,15 @@
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+sqlmodel==0.0.48
+PyJWT==2.15.1
+bcrypt==5.0.0
+python-multipart==0.0.32
+python-dotenv==1.2.4
+google-genai==2.33.0
+
+# tests
+pytest==9.1.1
+httpx==0.28.1
+
+# only for docs/wireframes/generate.py
+pillow
