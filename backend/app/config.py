@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{(BASE_DIR / 'clubos.db').as_posix()}")
+default_db_path = Path("/tmp/clubos-demo.db") if os.getenv("VERCEL") else BASE_DIR / "clubos.db"
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{default_db_path.as_posix()}")
 
 JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-secret-change-me-before-deploying")
 JWT_EXPIRE_HOURS = int(os.getenv("JWT_EXPIRE_HOURS", "72"))

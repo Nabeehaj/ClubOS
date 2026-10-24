@@ -39,8 +39,8 @@ def test_every_demo_account_can_log_in(client):
 
 def test_requires_login_and_membership(client):
     assert client.get("/api/clubs/1/dashboard").status_code == 401
-    h, _ = login(client, "sofia")  # Sofia is only in the Design club
-    assert client.get("/api/clubs/1/dashboard", headers=h).status_code == 403
+    h, _ = login(client, "sarah")
+    assert client.get("/api/clubs/999/dashboard", headers=h).status_code == 404
 
 
 def test_full_demo_flow(client):
@@ -50,7 +50,7 @@ def test_full_demo_flow(client):
 
     # 1. dashboard
     dash = client.get(f"{base}/dashboard", headers=h).json()
-    assert dash["club"]["name"] == "SBU Tech Society"
+    assert dash["club"]["name"] == "Stony Brook Computing Society (SBCS)"
     assert dash["stats"]["board_members"] == 7
     nn = next(e for e in dash["upcoming_events"] if e["name"] == "Fall Tech Networking Night")
     assert nn["task_progress"] == {"completed": 5, "total": 8}
@@ -120,9 +120,9 @@ def test_finance_is_president_or_treasurer_only(client):
     assert r.status_code == 201
 
 
-def test_other_templates_and_club_switching(client):
+def test_other_templates_and_single_club(client):
     h, data = login(client, "aisha")
-    assert {c["name"] for c in data["clubs"]} == {"SBU Tech Society", "SBU Design & Media Collective"}
+    assert {c["name"] for c in data["clubs"]} == {"Stony Brook Computing Society (SBCS)"}
     r = client.post("/api/clubs/1/emails/generate", headers=h,
                     json={"template": "catering_quote", "event_id": 1, "vendor_id": 1})
     assert r.status_code == 200 and "orders@campusbites.example" in r.json()["to"]

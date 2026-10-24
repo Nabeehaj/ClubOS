@@ -1,11 +1,8 @@
-Name,Email,Password,Clubs & positions,Can manage finances (in at least one club)
-Sarah Chen,sarah@sbu.clubos,Sarah!Tech2026,SBU Tech Society - President,Yes
-Adam Khan,adam@sbu.clubos,Adam#VicePres26,SBU Tech Society - Vice President | SBU Robotics Club - Events Chair,No
-Emily Park,emily@sbu.clubos,Emily$Treasury26,SBU Tech Society - Treasurer,Yes
-James Wilson,james@sbu.clubos,James&Minutes26,SBU Tech Society - Secretary | SBU Design & Media Collective - Marketing Chair,No
-Aisha Rahman,aisha@sbu.clubos,Aisha*Events26,SBU Tech Society - Events Chair | SBU Design & Media Collective - Events Chair,No
-Daniel Lee,daniel@sbu.clubos,Daniel^Design26,SBU Tech Society - Marketing Chair | SBU Design & Media Collective - Vice President,No
-Priya Patel,priya@sbu.clubos,Priya@Robots26,SBU Tech Society - Outreach Chair | SBU Robotics Club - President,Yes
-Marcus Johnson,marcus@sbu.clubos,Marcus%Build26,SBU Robotics Club - Vice President | SBU Design & Media Collective - Treasurer,Yes
-Sofia Martinez,sofia@sbu.clubos,Sofia+Media26,SBU Design & Media Collective - President,Yes
-Kevin Nguyen,kevin@sbu.clubos,Kevin=Ledger26,SBU Robotics Club - Treasurer,Yes
+Name,Email,Password,Club & position,Can manage finances
+Sarah Chen,sarah@sbu.clubos,Sarah!Tech2026,SBCS - President,Yes
+Adam Khan,adam@sbu.clubos,Adam#VicePres26,SBCS - Vice President,No
+Emily Park,emily@sbu.clubos,Emily$Treasury26,SBCS - Treasurer,Yes
+James Wilson,james@sbu.clubos,James&Minutes26,SBCS - Secretary,No
+Aisha Rahman,aisha@sbu.clubos,Aisha*Events26,SBCS - Events Chair,No
+Daniel Lee,daniel@sbu.clubos,Daniel^Design26,SBCS - Marketing Chair,No
+Priya Patel,priya@sbu.clubos,Priya@Robots26,SBCS - Outreach Chair,No
