@@ -13,7 +13,7 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-only-secret-change-me-before-deploying
 JWT_EXPIRE_HOURS = int(os.getenv("JWT_EXPIRE_HOURS", "72"))
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
 
 # Allowed frontend origins
 FRONTEND_ORIGINS = [

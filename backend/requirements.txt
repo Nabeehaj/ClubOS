@@ -6,6 +6,7 @@ bcrypt==5.0.0
 python-multipart==0.0.32
 python-dotenv==1.2.4
 google-genai==2.33.0
+truststore==0.10.5
 
 # tests
 pytest==9.1.1
