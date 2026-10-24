@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+
+/* ClubOS: a warm, paper-like workspace with one campus-red accent.
+   Older ink-* class names remain mapped to these quiet surfaces. */
+@theme {
+  --color-ink-950: #f4f2ed;
+  --color-ink-900: #fffefa;
+  --color-ink-850: #f8f6f1;
+  --color-ink-800: #eeebe3;
+  --color-ink-700: #e4dfd5;
+  --color-ink-600: #d4cec2;
+
+  --color-line: #e5e0d6;
+  --color-line-strong: #cfc7b9;
+
+  --color-fg: #202824;
+  --color-muted: #52605a;
+  --color-faint: #68746e;
+
+  /* v1 names, now neutral steel so leftover usages stay quiet */
+  --color-violet: #5d675f;
+  --color-violet-soft: #46544c;
+  --color-cyan: #315c62;
+
+  --color-copper: #a8422d;
+  --color-copper-soft: #853522;
+
+  --color-ok: #286d50;
+  --color-warn: #8e621d;
+  --color-bad: #a63830;
+  --color-info: #315c76;
+
+  --font-display: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+  --accent: #a8422d;
+  --line: #e5e0d6;
+  --line-strong: #cfc7b9;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink-950);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Headings: the same family, wider and heavier, like lettering stamped on a machine plate. */
+.font-display {
+  letter-spacing: -0.035em;
+}
+
+::selection {
+  background: rgb(168 66 45 / 0.22);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.border-line {
+  border-color: var(--line);
+}
+
+/* Panel surface. Flat: no blur, no glow. */
+.glass {
+  background: var(--color-ink-900);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px rgb(39 45 36 / 0.045);
+}
+
+/* v1 leftovers, neutralised */
+.spotlight {
+  position: relative;
+}
+.text-energy { color: var(--color-copper-soft); }
+
+.workspace-main { background: var(--color-ink-950); }
+.app-sidebar { background: #fbfaf6; }
+.app-topbar { background: rgb(251 250 246 / 0.91); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.app-nav-item[aria-current='page'] { font-weight: 650; }
+.app-nav-item[aria-current='page']::before { content: ''; position: absolute; left: -12px; top: 7px; bottom: 7px; width: 3px; border-radius: 0 4px 4px 0; background: var(--color-copper); }
+.page-kicker { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--color-copper-soft); }
+.page-title { font-family: var(--font-display); font-size: clamp(26px, 2.8vw, 38px); line-height: 1.07; font-weight: 690; letter-spacing: -.04em; }
+
+@media (max-width: 767px) {
+  .app-sidebar { width: 100%; height: 64px; padding: 4px 6px; border-right: 0; border-top: 1px solid var(--color-line); order: 2; }
+  .app-sidebar .sidebar-brand, .app-sidebar .sidebar-club, .app-sidebar .sidebar-footer { display: none; }
+  .app-sidebar nav { display: flex; margin: 0; overflow-x: auto; gap: 2px; align-items: center; }
+  .app-sidebar nav a { min-width: 64px; height: 54px; flex-direction: column; justify-content: center; gap: 2px; padding: 3px 7px; font-size: 10px; white-space: nowrap; }
+  .app-sidebar nav a svg { width: 18px; height: 18px; }
+  .app-nav-item[aria-current='page']::before { left: 10px; right: 10px; top: auto; bottom: 1px; width: auto; height: 2px; }
+  .app-topbar { padding-inline: 16px; }
+  .workspace-main { padding: 20px 16px 42px; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Loading placeholder: a slow, quiet pulse */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+}
+.skeleton {
+  background: var(--color-ink-800);
+  border-radius: 6px;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+[data-quality='low'] .skeleton {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
