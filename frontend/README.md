@@ -1,16 +1,28 @@
-# React + Vite
+# ClubOS frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React/Vite UI for the ClubOS demo. It talks to the FastAPI backend through `VITE_API_URL`.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm ci
+npm run dev
+```
 
-## React Compiler
+The default API URL is `http://localhost:8000`. To use another API, copy `.env.example` to `.env` and change `VITE_API_URL`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Vercel deployment
 
-## Expanding the Oxlint configuration
+Import the GitHub repository as a Vercel project with these settings:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+| Setting | Value |
+| --- | --- |
+| Root Directory | `frontend` |
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Environment Variable | `VITE_API_URL=https://<your-public-api-host>` |
+
+Set `VITE_API_URL` for both Preview and Production before building. It is a public browser-side setting, not a secret. The API must be reachable over HTTPS and allow the deployed frontend origin in its `FRONTEND_ORIGINS` setting. The backend needs a persistent database for shared demo changes; its local SQLite file is not a persistent Vercel database.
+
+`vercel.json` sends direct page loads (for example `/c/1/finance`) to the React app. After deploying, test both the root URL and a direct page URL, then log in and try a write action.
