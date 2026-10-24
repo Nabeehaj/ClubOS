@@ -114,6 +114,23 @@ body {
 .page-kicker { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--color-copper-soft); }
 .page-title { font-family: var(--font-display); font-size: clamp(26px, 2.8vw, 38px); line-height: 1.07; font-weight: 690; letter-spacing: -.04em; }
 
+/* A precise navigation moment; motion is confined to the quick-jump palette. */
+.quickjump-trigger { transition: border-color 150ms var(--ease-out-expo), color 150ms var(--ease-out-expo), transform 100ms ease-out; }
+.quickjump-trigger:active { transform: scale(.97); }
+.quickjump-panel { transform: translateX(-50%); }
+.quickjump-result::before { content: ''; position: absolute; inset-block: 9px; left: 0; width: 3px; border-radius: 3px; background: var(--color-copper); transform: scaleY(0); transition: transform 160ms var(--ease-out-expo); }
+.quickjump-result:is(:hover, :focus-visible)::before { transform: scaleY(1); }
+.quickjump-arrow { transition: transform 160ms var(--ease-out-expo), color 160ms var(--ease-out-expo); }
+.quickjump-result:is(:hover, :focus-visible) .quickjump-arrow { transform: translate(2px, -2px); color: var(--color-copper); }
+@keyframes quickjump-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes quickjump-overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes quickjump-panel-in { from { opacity: 0; transform: translate(-50%, -8px) scale(.985); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@keyframes quickjump-panel-out { from { opacity: 1; transform: translate(-50%, 0) scale(1); } to { opacity: 0; transform: translate(-50%, -5px) scale(.99); } }
+.quickjump-overlay[data-state='open'] { animation: quickjump-overlay-in 220ms ease-out both; }
+.quickjump-overlay[data-state='closed'] { animation: quickjump-overlay-out 150ms ease-in both; }
+.quickjump-panel[data-state='open'] { animation: quickjump-panel-in 240ms var(--ease-out-expo) both; }
+.quickjump-panel[data-state='closed'] { animation: quickjump-panel-out 160ms ease-in both; }
+
 @media (max-width: 767px) {
   .app-sidebar { width: 100%; height: 64px; padding: 4px 6px; border-right: 0; border-top: 1px solid var(--color-line); order: 2; }
   .app-sidebar .sidebar-brand, .app-sidebar .sidebar-club, .app-sidebar .sidebar-footer { display: none; }
@@ -146,6 +163,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .quickjump-panel[data-state='open'], .quickjump-panel[data-state='closed'],
+  .quickjump-overlay[data-state='open'], .quickjump-overlay[data-state='closed'] { animation: none !important; }
+  .quickjump-result::before, .quickjump-arrow, .quickjump-trigger { transition-duration: .01ms !important; }
   .skeleton {
     animation: none;
   }
