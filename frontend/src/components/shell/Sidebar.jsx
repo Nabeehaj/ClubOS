@@ -44,7 +44,7 @@ export function ClubSwitcher() {
           <ClubBadge club={club} />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[13px] font-medium text-fg">{club?.name ?? 'Select a club'}</span>
-            <span className="block truncate text-[11.5px] text-faint">{club?.position}</span>
+            <span className="block truncate text-[11.5px] text-faint">Demo · {club?.position}</span>
           </span>
           <ChevronsUpDown className="size-3.5 text-faint" aria-hidden />
         </button>
@@ -55,7 +55,7 @@ export function ClubSwitcher() {
           sideOffset={6}
           className="z-50 w-[248px] rounded-lg border border-line-strong bg-ink-850 p-1 shadow-2xl shadow-black/40 data-[state=open]:animate-[pop-in_0.16s_ease-out]"
         >
-          <DropdownMenu.Label className="px-2 pb-1 pt-1.5 text-[11.5px] text-faint">Your clubs</DropdownMenu.Label>
+          <DropdownMenu.Label className="px-2 pb-1 pt-1.5 text-[11.5px] text-faint">Demo workspace</DropdownMenu.Label>
           {clubs.map((c) => (
             <DropdownMenu.Item
               key={c.id}
@@ -65,7 +65,7 @@ export function ClubSwitcher() {
               <ClubBadge club={c} size={24} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] text-fg">{c.name}</span>
-                <span className="block truncate text-[11.5px] text-faint">{c.position}</span>
+                <span className="block truncate text-[11.5px] text-faint">Demo · {c.position}</span>
               </span>
               {String(c.id) === String(club?.id) && <Check className="size-4 text-copper" aria-label="Current club" />}
             </DropdownMenu.Item>

@@ -31,8 +31,11 @@ For local development, start FastAPI on port 8000 and Vite on port 5173. Vite
 proxies `/api/*` to FastAPI. `VITE_API_URL` is an optional override for a
 separately hosted API; leave it unset for same-origin Vercel previews.
 
-This is a **single-club SBCS demo**, not a production data system. On Vercel,
-the API seeds fictional SBCS data into a temporary SQLite file. Each function
+This is a **single-club SBCS demo**, not a production data system. The club
+identity, contact email and SBUHacks details come from the supplied spreadsheet
+and official SBCS pages; [data provenance and limits](docs/SBCS_DATA.md) are
+documented separately. The board accounts, tasks, approvals, vendors and
+finances are simulated. On Vercel, the API seeds data into a temporary SQLite file. Each function
 instance can have a different copy, and all changes may disappear at any time.
 This is suitable for UI review, but not for shared edits, real student records,
 or reliable persistent collaboration. Local development still uses

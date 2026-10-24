@@ -28,13 +28,13 @@ function ClubHeader({ club, boardSize, totalOpen }) {
         {club?.description && <p className="mt-1 text-[14px] leading-relaxed text-muted">{club.description}</p>}
       </div>
       <dl className="flex flex-wrap divide-x divide-line">
-        {club?.member_count != null && (
+        {club?.member_count > 0 && (
           <Fact label="Members">
             <span className="tabular">{club.member_count}</span>
           </Fact>
         )}
-        <Fact label="Board">
-          <span className="tabular">{boardSize}</span> <span className="font-normal text-muted">officers</span>
+        <Fact label="Demo board">
+          <span className="tabular">{boardSize}</span> <span className="font-normal text-muted">sample accounts</span>
         </Fact>
         <Fact label="Open tasks">
           <span className="tabular">{totalOpen}</span>
@@ -71,6 +71,30 @@ function MembersSkeleton() {
   )
 }
 
+function PublicFacts({ club }) {
+  const facts = club?.public_facts
+  if (!facts) return null
+  const officer = facts.officer_from_spreadsheet
+  return (
+    <motion.section variants={rise} className="rounded-xl border border-line bg-ink-900 p-5" aria-label="SBCS public facts">
+      <p className="page-kicker">SBCS public facts</p>
+      <div className="mt-3 grid gap-5 text-[13px] leading-relaxed text-muted md:grid-cols-2">
+        <div>
+          <p className="font-semibold text-fg">Club contact</p>
+          <a href={`mailto:${club.email}`} className="underline-offset-4 hover:underline">{club.email}</a>
+          {officer && <p className="mt-3"><span className="font-semibold text-fg">Spreadsheet listing:</span> {officer.name}, {officer.role}. <span className="text-faint">{officer.note}</span></p>}
+          {officer?.email && <a href={`mailto:${officer.email}`} className="mt-1 block underline-offset-4 hover:underline">{officer.email}</a>}
+        </div>
+        <div>
+          <p className="font-semibold text-fg">Meeting information</p>
+          <p>{facts.meeting_note}</p>
+          <a href={facts.club_url} target="_blank" rel="noreferrer" className="mt-3 inline-block text-copper underline-offset-4 hover:underline">View SBCS’s university page ↗</a>
+        </div>
+      </div>
+    </motion.section>
+  )
+}
+
 export default function Members() {
   const { clubId, club, api } = useClub()
   const { user } = useAuth()
@@ -93,11 +117,12 @@ export default function Members() {
   return (
     <motion.div variants={stagger()} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={rise}>
-        <p className="page-kicker">The board behind the work</p>
+        <p className="page-kicker">Club profile and demo workspace</p>
         <h2 className="page-title mt-2">Members</h2>
-        <p className="mt-2 text-[14px] text-muted">See who's on the team and where help is needed.</p>
+        <p className="mt-2 text-[14px] text-muted">Real club details above; fictional board accounts below for exploring ClubOS.</p>
       </motion.div>
       <ClubHeader club={club} boardSize={members.length} totalOpen={workload.totalOpen} />
+      <PublicFacts club={club} />
 
       {members.length === 0 ? (
         <motion.div variants={rise} className="rounded-xl border border-line bg-ink-900">
@@ -113,7 +138,7 @@ export default function Members() {
 
           <section aria-labelledby="board-heading">
             <motion.h2 id="board-heading" variants={rise} className="mb-3 text-[14px] font-semibold text-fg">
-              Board members <span className="tabular font-normal text-faint">{members.length}</span>
+              Demo board members <span className="tabular font-normal text-faint">{members.length}</span>
             </motion.h2>
             <motion.div variants={stagger()} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {members.map((m) => (

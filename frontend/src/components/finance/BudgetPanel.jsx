@@ -87,7 +87,7 @@ function Figures({ summary }) {
 
   return (
     <div className="grid grid-cols-2 divide-line border-b border-line md:grid-cols-4 md:divide-x [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-line md:[&>*:nth-child(n+3)]:border-t-0">
-      <Figure label="Annual budget" value={annual_budget} note="For the academic year" />
+      <Figure label="Demo annual budget" value={annual_budget} note="Not a verified SBCS allocation" />
       <Figure label="Spent" value={spent} note={`${percent_used}% of the annual budget`} />
       <Figure label="Remaining" value={remaining} {...remainingNote} />
       <Figure label="Unallocated" value={unallocated} {...unallocNote} />

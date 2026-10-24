@@ -40,6 +40,7 @@ class Club(SQLModel, table=True):
     email: Optional[str] = None
     logo_url: Optional[str] = None
     accent_color: Optional[str] = None
+    public_facts: dict = Field(default_factory=dict, sa_column=Column(JSON))
 
 
 class Membership(SQLModel, table=True):

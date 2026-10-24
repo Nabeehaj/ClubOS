@@ -51,6 +51,9 @@ def test_full_demo_flow(client):
     # 1. dashboard
     dash = client.get(f"{base}/dashboard", headers=h).json()
     assert dash["club"]["name"] == "Stony Brook Computing Society (SBCS)"
+    assert dash["club"]["email"] == "sbcomputingsociety@cs.stonybrook.edu"
+    assert dash["club"]["public_facts"]["event"]["name"] == "SBUHacks 2026"
+    assert dash["club"]["public_facts"]["officer_from_spreadsheet"]["name"] == "Eduardo Lozano"
     assert dash["stats"]["board_members"] == 7
     nn = next(e for e in dash["upcoming_events"] if e["name"] == "Fall Tech Networking Night")
     assert nn["task_progress"] == {"completed": 5, "total": 8}

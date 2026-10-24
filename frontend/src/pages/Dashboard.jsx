@@ -123,9 +123,9 @@ function NextEvent({ event, clubId }) {
 // ---------- club at a glance: one instrument strip ----------
 function Glance({ stats }) {
   const cells = [
-    { label: 'Members', value: stats.members, sub: `${stats.board_members} on the board` },
+    { label: 'Demo board', value: stats.board_members, sub: 'Fictional sample accounts' },
     { label: 'Open tasks', value: stats.open_tasks, sub: stats.overdue_tasks ? `${stats.overdue_tasks} overdue` : `${stats.completed_tasks} done` },
-    { label: 'Budget left', value: stats.budget_remaining, format: moneyFmt, sub: `${money(stats.budget_spent)} of ${money(stats.budget_total)} spent`, meter: stats.budget_percent_used },
+    { label: 'Demo budget left', value: stats.budget_remaining, format: moneyFmt, sub: `${money(stats.budget_spent)} of ${money(stats.budget_total)} simulated`, meter: stats.budget_percent_used },
     { label: 'Waiting on the university', value: stats.pending_approvals, sub: '25Live, SB Engaged, NXT' },
     { label: 'Upcoming events', value: stats.upcoming_events, sub: 'This semester' },
   ]
@@ -429,6 +429,11 @@ export default function Dashboard() {
   return (
     <motion.div variants={stagger()} initial="hidden" animate="show" className="space-y-4">
       <Headline name={firstName} event={next} />
+      {d.club?.public_facts?.event && <motion.div variants={rise} className="rounded-xl border border-line bg-ink-900 px-5 py-4 text-[13px] text-muted">
+        <span className="font-semibold text-fg">From SBCS:</span> {d.club.public_facts.event.name}, {d.club.public_facts.event.dates} at {d.club.public_facts.event.location}.{' '}
+        <a href={d.club.public_facts.event.url} target="_blank" rel="noreferrer" className="text-copper underline-offset-4 hover:underline">Official event page ↗</a>
+        <p className="mt-2 text-faint">The board, planning tasks, approvals, and finances elsewhere in this workspace are interactive demo scenarios—not SBCS records.</p>
+      </motion.div>}
       {next && <NextEvent event={next} clubId={clubId} />}
       <Glance stats={d.stats} />
       <div className="grid gap-4 lg:grid-cols-5">

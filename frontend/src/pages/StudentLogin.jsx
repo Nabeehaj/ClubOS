@@ -22,18 +22,22 @@ export default function StudentLogin() {
 
   if (status === 'authed' && !busy) return <Navigate to="/" replace />
 
-  async function submit(event) {
-    event.preventDefault()
+  async function logIn(loginEmail, loginPassword) {
     if (busy) return
     setError('')
     setBusy(true)
     try {
-      await signIn(email.trim(), password)
+      await signIn(loginEmail, loginPassword)
       navigate(location.state?.from ?? '/', { replace: true })
     } catch (err) {
       setError(err.status === 401 ? 'That email and password do not match. Try again.' : err.message)
       setBusy(false)
     }
+  }
+
+  function submit(event) {
+    event.preventDefault()
+    logIn(email.trim(), password)
   }
 
   return (
@@ -85,7 +89,10 @@ export default function StudentLogin() {
             {error && <p role="alert" className="rounded-lg border border-bad/25 bg-bad/5 px-4 py-3 text-[13px] text-bad">{error}</p>}
             <button type="submit" disabled={busy} className="flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-copper px-5 text-[15px] font-semibold text-white transition-colors hover:bg-copper-soft disabled:cursor-wait disabled:opacity-60">{busy ? 'Signing in…' : 'Enter ClubOS'}<ArrowRight className="size-4" aria-hidden /></button>
           </form>
-          <div className="mt-10 border-t border-line pt-5 text-[13px] leading-6 text-muted">On your club's board but don't have access? Ask your president to add you.</div>
+          <div className="mt-8 border-t border-line pt-5">
+            <button type="button" onClick={() => logIn('sarah@sbu.clubos', 'Sarah!Tech2026')} disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-line-strong text-[14px] font-semibold text-fg transition-colors hover:border-copper hover:bg-ink-900 disabled:opacity-60">Explore the SBCS demo <ArrowRight className="size-4" aria-hidden /></button>
+            <p className="mt-3 text-center text-[12px] leading-5 text-faint">Public SBCS facts plus simulated workflows. Changes may reset and aren’t shared.</p>
+          </div>
         </div>
       </section>
     </main>

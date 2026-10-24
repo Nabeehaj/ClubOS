@@ -253,7 +253,7 @@ export default function Login() {
                 Explore the SBCS demo <ArrowRight className="size-4" aria-hidden />
               </button>
               <p className="mt-3 text-center text-xs leading-relaxed text-faint">
-                Fictional sample data. Changes may reset and aren’t shared with teammates.
+                Public SBCS facts plus clearly labeled demo workflows. Changes may reset and aren’t shared.
               </p>
             </div>
           </motion.form>

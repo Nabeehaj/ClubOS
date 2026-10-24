@@ -1,6 +1,8 @@
-"""Fictional demo data. Run `python -m app.seed` to reset the database.
+"""SBCS public facts and fictional workflow data. Run `python -m app.seed` to reset.
 
-People, emails, vendors and 25Live / SB Engaged / NXT records are fictional or simulated.
+The public club email and event details come from the supplied workbook and
+official SBCS pages; demo accounts, vendors, budgets and university workflows
+are fictional or simulated.
 """
 from datetime import date, datetime, timedelta
 from urllib.parse import quote
@@ -28,8 +30,24 @@ DEMO_USERS = {
 DEMO_CLUBS = {
     "tech": dict(name="Stony Brook Computing Society (SBCS)", slug="stony-brook-computing-society",
                  category="Academic / Professional",
-                 description="A sample workspace for Stony Brook's computing community. All people, events, and finances shown here are fictional demo data.",
-                 member_count=120, annual_budget=5000, email="sbcs-demo@sbu.clubos", accent_color="#6C5CE7"),
+                 description="A student-run community connecting students interested in technology with the tech industry through workshops, networking, and social events.",
+                 member_count=0, annual_budget=5000, email="sbcomputingsociety@cs.stonybrook.edu",
+                 accent_color="#6C5CE7",
+                 public_facts={
+                     "club_url": "https://linguistics.stonybrook.edu/commcms/ceas-undergrad/student_organization/sbcs.php",
+                     "event": {
+                         "name": "SBUHacks 2026",
+                         "dates": "October 23–25, 2026",
+                         "location": "Melville Library Central Reading Room and SAC Auditorium",
+                         "url": "https://hack.sbcs.io/",
+                     },
+                     "officer_from_spreadsheet": {
+                         "name": "Eduardo Lozano", "role": "President",
+                         "email": "eduardo.lozanonaranjo@stonybrook.edu",
+                         "note": "Listed in the supplied spreadsheet (compiled October 24, 2026); current role not independently verified.",
+                     },
+                     "meeting_note": "Current meeting time not confirmed; the supplied spreadsheet contains conflicting entries.",
+                 }),
 }
 
 DEMO_BOARDS = {
