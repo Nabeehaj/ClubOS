@@ -32,20 +32,28 @@ def generate(contents, gen_config):
     """Call Gemini, retrying busy errors and then falling back to the next model in the list."""
     from google.genai import errors, types
 
-    if gen_config.thinking_config is None:
+    fast = gen_config.thinking_config is None
+    if fast:
         gen_config.thinking_config = types.ThinkingConfig(thinking_budget=config.GEMINI_THINKING_BUDGET)
+    plain = gen_config.model_copy(update={"thinking_config": None})  # for models that reject a thinking budget
     client = get_client()
     last = None
     for model in config.GEMINI_MODELS:
-        for attempt in range(len(RETRY_DELAYS) + 1):
+        cfg, attempt = gen_config, 0
+        while True:
             try:
-                return client.models.generate_content(model=model, contents=contents, config=gen_config)
+                return client.models.generate_content(model=model, contents=contents, config=cfg)
             except errors.APIError as e:
                 last = e
-                if e.code in BUSY and attempt < len(RETRY_DELAYS):
-                    time.sleep(RETRY_DELAYS[attempt])
+                if e.code == 400 and fast and cfg is gen_config:
+                    cfg = plain
                     continue
-                if e.code in BUSY or e.code == 404:  # busy for good, or model retired: try the next one
+                daily_quota = e.code == 429 and "quota" in str(e).lower()
+                if e.code in BUSY and not daily_quota and attempt < len(RETRY_DELAYS):
+                    time.sleep(RETRY_DELAYS[attempt])
+                    attempt += 1
+                    continue
+                if e.code in BUSY or e.code == 404:  # busy for good, out of quota, or retired: next model
                     break
                 raise HTTPException(status_code=502, detail=f"AI request failed: {e}") from e
             except Exception as e:
