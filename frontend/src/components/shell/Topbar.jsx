@@ -12,6 +12,7 @@ import { useQuality } from '@/lib/motion'
 import { Avatar } from '@/components/ui/Avatar'
 import { toast } from '@/components/ui/Toast'
 import { ClubSwitcher } from '@/components/shell/Sidebar'
+import { QuickJump } from '@/components/shell/QuickJump'
 
 function AiButton() {
   const { clubId, api } = useClub()
@@ -122,6 +123,7 @@ export function Topbar() {
         <h1 className="truncate font-medium text-fg">{title}</h1>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        <QuickJump />
         <div className="hidden sm:block"><AiButton /></div>
         <UserMenu />
       </div>

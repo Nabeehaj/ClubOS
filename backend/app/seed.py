@@ -1,6 +1,8 @@
-"""Fictional demo data. Run `python -m app.seed` to reset the database.
+"""SBCS public facts and fictional workflow data. Run `python -m app.seed` to reset.
 
-People, emails, vendors and 25Live / SB Engaged / NXT records are fictional or simulated.
+The public club email and event details come from the supplied workbook and
+official SBCS pages; demo accounts, vendors, budgets and university workflows
+are fictional or simulated.
 """
 from datetime import date, datetime, timedelta
 from urllib.parse import quote
@@ -23,21 +25,29 @@ DEMO_USERS = {
     "aisha": ("Aisha Rahman", "aisha@sbu.clubos", "Aisha*Events26", "Computer Engineering", 2027),
     "daniel": ("Daniel Lee", "daniel@sbu.clubos", "Daniel^Design26", "Digital Arts", 2026),
     "priya": ("Priya Patel", "priya@sbu.clubos", "Priya@Robots26", "Mechanical Engineering", 2026),
-    "marcus": ("Marcus Johnson", "marcus@sbu.clubos", "Marcus%Build26", "Electrical Engineering", 2027),
-    "sofia": ("Sofia Martinez", "sofia@sbu.clubos", "Sofia+Media26", "Journalism", 2026),
-    "kevin": ("Kevin Nguyen", "kevin@sbu.clubos", "Kevin=Ledger26", "Economics", 2028),
 }
 
 DEMO_CLUBS = {
-    "tech": dict(name="SBU Tech Society", slug="sbu-tech-society", category="Academic / Professional",
-                 description="A student organization focused on technology, innovation, and networking.",
-                 member_count=120, annual_budget=5000, email="techsociety@sbu.clubos", accent_color="#6C5CE7"),
-    "robotics": dict(name="SBU Robotics Club", slug="sbu-robotics", category="Engineering",
-                     description="Designing, building, and battling robots, from first Arduino to competition bots.",
-                     member_count=65, annual_budget=3500, email="robotics@sbu.clubos", accent_color="#00B894"),
-    "design": dict(name="SBU Design & Media Collective", slug="sbu-design-media", category="Arts / Media",
-                   description="Photographers, designers, and video makers building portfolios together.",
-                   member_count=48, annual_budget=2000, email="designmedia@sbu.clubos", accent_color="#E17055"),
+    "tech": dict(name="Stony Brook Computing Society (SBCS)", slug="stony-brook-computing-society",
+                 category="Academic / Professional",
+                 description="A student-run community connecting students interested in technology with the tech industry through workshops, networking, and social events.",
+                 member_count=0, annual_budget=5000, email="sbcomputingsociety@cs.stonybrook.edu",
+                 accent_color="#6C5CE7",
+                 public_facts={
+                     "club_url": "https://linguistics.stonybrook.edu/commcms/ceas-undergrad/student_organization/sbcs.php",
+                     "event": {
+                         "name": "SBUHacks 2026",
+                         "dates": "October 23–25, 2026",
+                         "location": "Melville Library Central Reading Room and SAC Auditorium",
+                         "url": "https://hack.sbcs.io/",
+                     },
+                     "officer_from_spreadsheet": {
+                         "name": "Eduardo Lozano", "role": "President",
+                         "email": "eduardo.lozanonaranjo@stonybrook.edu",
+                         "note": "Listed in the supplied spreadsheet (compiled October 24, 2026); current role not independently verified.",
+                     },
+                     "meeting_note": "Current meeting time not confirmed; the supplied spreadsheet contains conflicting entries.",
+                 }),
 }
 
 DEMO_BOARDS = {
@@ -49,19 +59,6 @@ DEMO_BOARDS = {
         ("aisha", "Events Chair", ["Room reservations (25Live)", "Event logistics", "Day-of coordination"]),
         ("daniel", "Marketing Chair", ["Flyers & social media", "Photography", "Branding"]),
         ("priya", "Outreach Chair", ["Partner clubs", "Equipment & tech setup"]),
-    ],
-    "robotics": [
-        ("priya", "President", ["Leads build season", "SB Engaged registrations"]),
-        ("marcus", "Vice President", ["Workshop instruction", "Lab safety"]),
-        ("kevin", "Treasurer", ["Parts budget", "NXT requests"]),
-        ("adam", "Events Chair", ["Competition logistics", "Room bookings"]),
-    ],
-    "design": [
-        ("sofia", "President", ["Portfolio programs", "Partnerships"]),
-        ("daniel", "Vice President", ["Creative direction", "Workshops"]),
-        ("marcus", "Treasurer", ["Equipment budget", "NXT requests"]),
-        ("aisha", "Events Chair", ["Photo walks", "Gallery nights"]),
-        ("james", "Marketing Chair", ["Instagram", "Newsletter"]),
     ],
 }
 
@@ -96,8 +93,6 @@ def seed(session: Session) -> dict:
     session.flush()
 
     seed_tech(session, clubs["tech"], users)
-    seed_robotics(session, clubs["robotics"], users)
-    seed_design(session, clubs["design"], users)
     session.commit()
     return {"users": len(users), "clubs": len(clubs)}
 
@@ -181,7 +176,7 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
     _messages(session, general, u, [
         ("sarah", "Welcome back everyone! Fall Tech Networking Night is Nov 5, save the date.", 70),
         ("daniel", "Flyers are up on Instagram and the SAC boards!", 50),
-        ("priya", "Robotics Club wants to co-promote the AI Workshop, any objections?", 26),
+        ("priya", "I can help demo the AI Workshop setup. Any objections?", 26),
         ("adam", "Love that, let's do it.", 25),
     ])
     _messages(session, board_ch, u, [

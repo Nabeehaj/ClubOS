@@ -34,7 +34,7 @@ export function Toaster() {
   }, [])
 
   return (
-    <div className="pointer-events-none fixed bottom-5 right-5 z-[60] flex w-[340px] flex-col gap-2" aria-live="polite">
+    <div className="pointer-events-none fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-4 z-[60] flex w-[min(340px,calc(100vw-32px))] flex-col gap-2 md:bottom-5 md:right-5" aria-live="polite">
       <AnimatePresence initial={false}>
         {items.map((t) => {
           const Icon = ICONS[t.tone] ?? Info

@@ -73,13 +73,12 @@ export default function Login() {
 
   if (status === 'authed' && !launching && !submitted.current) return <Navigate to="/" replace />
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function logIn(loginEmail, loginPassword) {
     setError(null)
     setBusy(true)
     submitted.current = true
     try {
-      await signIn(email.trim(), password)
+      await signIn(loginEmail, loginPassword)
       // Engine start: spin the machine up, then fly into the app.
       setLaunching(true)
       boostTarget.current = 14
@@ -92,6 +91,11 @@ export default function Login() {
       )
       shake.start({ x: [0, -12, 10, -7, 5, -2, 0], transition: { duration: 0.5 } })
     }
+  }
+
+  function onSubmit(e) {
+    e.preventDefault()
+    logIn(email.trim(), password)
   }
 
   return (
@@ -239,7 +243,19 @@ export default function Login() {
               {!busy && <ArrowRight className="size-4" aria-hidden />}
             </Button>
 
-            <p className="mt-6 text-center text-xs text-faint">Board members only. Ask your president for access.</p>
+            <div className="mt-5 border-t border-white/10 pt-5">
+              <button
+                type="button"
+                onClick={() => logIn('sarah@sbu.clubos', 'Sarah!Tech2026')}
+                disabled={busy}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-fg transition hover:border-[var(--accent)] hover:bg-white/[0.06] disabled:opacity-50"
+              >
+                Explore the SBCS demo <ArrowRight className="size-4" aria-hidden />
+              </button>
+              <p className="mt-3 text-center text-xs leading-relaxed text-faint">
+                Public SBCS facts plus clearly labeled demo workflows. Changes may reset and aren’t shared.
+              </p>
+            </div>
           </motion.form>
         </motion.div>
       </div>

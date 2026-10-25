@@ -1,4 +1,5 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
+import { useLayoutEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import clsx from 'clsx'
@@ -7,8 +8,24 @@ import { spring } from '@/lib/motion'
 // Modal (center) or sheet (slides in from the right). Controlled: pass open + onOpenChange.
 export function Dialog({ open, onOpenChange, title, description, children, side = 'center', className, footer }) {
   const isSheet = side === 'right'
+  const opener = useRef(null)
+  const wasOpen = useRef(false)
+  useLayoutEffect(() => {
+    if (open && !wasOpen.current && document.activeElement !== document.body) opener.current = document.activeElement
+    wasOpen.current = open
+  }, [open])
+
+  function restoreFocus() {
+    const target = opener.current?.isConnected ? opener.current : document.getElementById('main-content')
+    window.setTimeout(() => target?.focus(), 0)
+    opener.current = null
+  }
+
   return (
-    <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
+    <RadixDialog.Root open={open} onOpenChange={(nextOpen) => {
+      onOpenChange(nextOpen)
+      if (!nextOpen) restoreFocus()
+    }}>
       <AnimatePresence>
         {open && (
           <RadixDialog.Portal forceMount>
@@ -22,6 +39,12 @@ export function Dialog({ open, onOpenChange, title, description, children, side 
             </RadixDialog.Overlay>
             <RadixDialog.Content asChild forceMount>
               <motion.div
+                onOpenAutoFocus={() => {
+                  if (!opener.current && document.activeElement !== document.body) opener.current = document.activeElement
+                }}
+                onCloseAutoFocus={(event) => {
+                  event.preventDefault()
+                }}
                 className={clsx(
                   'fixed z-50 flex flex-col overflow-hidden border border-line-strong bg-ink-900 shadow-2xl shadow-black/15 focus:outline-none',
                   isSheet

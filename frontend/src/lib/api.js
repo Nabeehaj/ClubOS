@@ -1,7 +1,9 @@
 // The only place the frontend talks to the backend. Screens import from here and never call fetch.
 // Contract: docs/FRONTEND_GUIDE.md. Errors are { detail: "..." }; 401 = back to login; 403 = show the message.
 
-export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '')
+// Browser requests stay on the current deployment, so /api reaches this
+// deployment's backend service in production (or Vite's proxy locally).
+export const API_URL = (import.meta.env.VITE_API_URL || window.location.origin).replace(/\/$/, '')
 
 const TOKEN_KEY = 'clubos.token'
 
