@@ -24,18 +24,18 @@ export function ReadinessRing({ score = 0, size = 120, stroke = 6, label = 'read
               y1={size / 2 + Math.sin(a) * r1}
               x2={size / 2 + Math.cos(a) * r2}
               y2={size / 2 + Math.sin(a) * r2}
-              stroke={i / ticks < pct ? '#a3a39c' : '#333333'}
+              stroke={i / ticks < pct ? 'var(--color-copper)' : 'var(--color-line-strong)'}
               strokeWidth={1}
             />
           )
         })}
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#262626" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-ink-800)" strokeWidth={stroke} />
         <motion.circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="#d0743a"
+          stroke="var(--color-copper)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}

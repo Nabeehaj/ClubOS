@@ -99,7 +99,7 @@ function TaskForm({ draft, landed, quoteRef, members, events, api, onCreated, on
 
   // Hand keyboard focus to the title once the values are in.
   useEffect(() => {
-    if (landed) titleRef.current?.focus({ preventScroll: true })
+    if (landed) titleRef.current?.focus({ preventScroll: !window.matchMedia('(max-width: 767px)').matches })
   }, [landed])
 
   const create = useMutation({
@@ -296,7 +296,7 @@ export function TaskPanel({ draft, landed, quoteRef, result, members, events, ap
             <EmptyState
               icon={ClipboardPlus}
               title="Pick a message to turn into a task"
-              hint="Hover a message in the thread, or tab to it, and choose Make task."
+              hint="Choose Make task on a message in the thread."
             />
           </motion.div>
         )}

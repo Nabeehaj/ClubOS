@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpRight, Mail, Save, Sparkles, Trash2 } from 'lucide-react'
 import { useClub } from '@/lib/club'
@@ -18,6 +18,7 @@ export default function EmailsPage() {
   const [note, setNote] = useState('')
   const [tone, setTone] = useState('friendly')
   const [email, setEmail] = useState(null)
+  const reviewHeadingRef = useRef(null)
   const templates = useQuery({ queryKey: ['club', String(clubId), 'emails', 'templates'], queryFn: api.emails.templates })
   const events = useQuery({ queryKey: ['club', String(clubId), 'emails', 'events'], queryFn: () => api.events.list() })
   const vendors = useQuery({ queryKey: ['club', String(clubId), 'emails', 'vendors'], queryFn: () => api.vendors.list() })
@@ -25,8 +26,8 @@ export default function EmailsPage() {
   const agent = useQuery({ queryKey: keys.agentStatus(clubId), queryFn: api.agent.status, retry: false })
   const generate = useMutation({ mutationFn: api.emails.generate, onSuccess: (data) => setEmail(data) })
   const polish = useMutation({ mutationFn: api.emails.polish, onSuccess: (data) => { setEmail((e) => ({ ...e, subject: data.subject, body: data.body })); toast('Draft polished. Review it before opening your mail app.') } })
-  const save = useMutation({ mutationFn: api.emails.saveDraft, onSuccess: () => { qc.invalidateQueries({ queryKey: ['club', String(clubId), 'emails', 'drafts'] }); toast('Draft saved') } })
-  const remove = useMutation({ mutationFn: api.emails.removeDraft, onSuccess: () => { qc.invalidateQueries({ queryKey: ['club', String(clubId), 'emails', 'drafts'] }); toast('Draft deleted') } })
+  const save = useMutation({ mutationFn: api.emails.saveDraft, onSuccess: () => { qc.invalidateQueries({ queryKey: ['club', String(clubId), 'emails', 'drafts'] }); toast('Draft saved') }, onError: (err) => toast.error(err) })
+  const remove = useMutation({ mutationFn: api.emails.removeDraft, onSuccess: () => { qc.invalidateQueries({ queryKey: ['club', String(clubId), 'emails', 'drafts'] }); toast('Draft deleted') }, onError: (err) => toast.error(err) })
   const needsEvent = template !== 'meeting_reminder'
   const needsVendor = template === 'catering_quote'
 
@@ -52,7 +53,7 @@ export default function EmailsPage() {
           <Button className="w-full" disabled={(needsEvent && !eventId) || (needsVendor && !vendorId)} loading={generate.isPending} onClick={() => generate.mutate(body())}>Generate draft</Button>
         </div>}
       </Card>
-      <Card className="overflow-hidden"><header className="border-b border-line px-5 py-5 sm:px-6"><span className="page-kicker">02 / Review</span><h3 className="mt-2 text-[18px] font-semibold text-fg">Make it yours</h3><p className="mt-1 text-[13px] text-muted">Read and edit every line before opening your mail app.</p></header>
+      <Card className="overflow-hidden"><header className="border-b border-line px-5 py-5 sm:px-6"><span className="page-kicker">02 / Review</span><h3 ref={reviewHeadingRef} tabIndex={-1} className="mt-2 text-[18px] font-semibold text-fg focus:outline-none">Make it yours</h3><p className="mt-1 text-[13px] text-muted">Read and edit every line before opening your mail app.</p></header>
         {!email ? <EmptyState icon={Mail} title="Your draft will appear here" hint="Pick a template and generate a message from your club's information." className="min-h-[340px]" /> : <div className="space-y-4 px-5 py-5 sm:px-6">
           <Field label="To">{(id) => <Input id={id} value={email.to ?? ''} onChange={(e) => setEmail({ ...email, to: e.target.value })} />}</Field>
           <Field label="Subject">{(id) => <Input id={id} value={email.subject ?? ''} onChange={(e) => setEmail({ ...email, subject: e.target.value })} />}</Field>
@@ -64,6 +65,6 @@ export default function EmailsPage() {
         </div>}
       </Card>
     </div>
-    <Card className="overflow-hidden"><header className="flex items-baseline justify-between border-b border-line px-5 py-4"><h3 className="text-[15px] font-semibold">Saved drafts</h3><span className="font-mono text-[11px] text-faint">{drafts.data?.length ?? 0}</span></header>{drafts.isPending ? <div className="p-5"><SkeletonRows rows={2} /></div> : drafts.isError ? <div className="p-5"><ErrorState compact error={drafts.error} onRetry={drafts.refetch} /></div> : !drafts.data?.length ? <EmptyState title="No saved drafts" hint="Save a draft when you want to come back to it." /> : <ul className="divide-y divide-line">{drafts.data.map((d) => <li key={d.id} className="flex items-center gap-3 px-5 py-3"><button type="button" onClick={() => { setTemplate(d.template); setEmail(d); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="min-w-0 flex-1 text-left"><span className="block truncate text-[13px] font-semibold text-fg">{d.subject}</span><span className="block truncate text-[12px] text-faint">{d.to || 'No recipient yet'}</span></button><button type="button" onClick={() => { if (window.confirm(`Delete “${d.subject}”?`)) remove.mutate(d.id) }} aria-label={`Delete draft ${d.subject}`} className="grid size-9 place-items-center rounded-md text-faint hover:bg-bad/5 hover:text-bad"><Trash2 className="size-4" aria-hidden /></button></li>)}</ul>}</Card>
+    <Card className="overflow-hidden"><header className="flex items-baseline justify-between border-b border-line px-5 py-4"><h3 className="text-[15px] font-semibold">Saved drafts</h3><span className="font-mono text-[11px] text-faint">{drafts.data?.length ?? 0}</span></header>{drafts.isPending ? <div className="p-5"><SkeletonRows rows={2} /></div> : drafts.isError ? <div className="p-5"><ErrorState compact error={drafts.error} onRetry={drafts.refetch} /></div> : !drafts.data?.length ? <EmptyState title="No saved drafts" hint="Save a draft when you want to come back to it." /> : <ul className="divide-y divide-line">{drafts.data.map((d) => <li key={d.id} className="flex items-center gap-3 px-5 py-3"><button type="button" onClick={() => { setTemplate(d.template); setEmail(d); requestAnimationFrame(() => reviewHeadingRef.current?.focus()) }} className="min-w-0 flex-1 text-left"><span className="block truncate text-[13px] font-semibold text-fg">{d.subject}</span><span className="block truncate text-[12px] text-faint">{d.to || 'No recipient yet'}</span></button><button type="button" onClick={() => { if (window.confirm(`Delete “${d.subject}”?`)) remove.mutate(d.id) }} aria-label={`Delete draft ${d.subject}`} className="grid size-9 place-items-center rounded-md text-faint hover:bg-bad/5 hover:text-bad"><Trash2 className="size-4" aria-hidden /></button></li>)}</ul>}</Card>
   </div>
 }

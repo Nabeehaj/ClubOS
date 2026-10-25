@@ -144,7 +144,7 @@ function MessageRow({ m, first, author, clubId, isDraft, createdTask, onMakeTask
           aria-label={`Make a task from ${author?.name ?? 'this'} message: ${snippet}`}
           aria-pressed={isDraft}
           className={clsx(
-            'absolute -top-3 right-3 z-10 inline-flex h-7 items-center gap-1.5 rounded-md border bg-ink-800 px-2.5 text-[12px] font-medium transition-[opacity,color,border-color]',
+            'message-task-action absolute -top-3 right-3 z-10 inline-flex h-7 items-center gap-1.5 rounded-md border bg-ink-800 px-2.5 text-[12px] font-medium transition-[opacity,color,border-color]',
             isDraft
               ? 'border-copper/60 text-fg opacity-100'
               : 'border-line text-muted opacity-0 hover:border-copper/60 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100',

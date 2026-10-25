@@ -122,6 +122,9 @@ body {
 .quickjump-result:is(:hover, :focus-visible)::before { transform: scaleY(1); }
 .quickjump-arrow { transition: transform 160ms var(--ease-out-expo), color 160ms var(--ease-out-expo); }
 .quickjump-result:is(:hover, :focus-visible) .quickjump-arrow { transform: translate(2px, -2px); color: var(--color-copper); }
+@media (hover: none), (pointer: coarse) {
+  .message-task-action { opacity: 1; }
+}
 @keyframes quickjump-overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes quickjump-overlay-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes quickjump-panel-in { from { opacity: 0; transform: translate(-50%, -8px) scale(.985); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
