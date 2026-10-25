@@ -32,20 +32,21 @@ def generate(contents, gen_config):
     """Call Gemini, retrying busy errors and then falling back to the next model in the list."""
     from google.genai import errors, types
 
-    fast = gen_config.thinking_config is None
-    if fast:
-        gen_config.thinking_config = types.ThinkingConfig(thinking_budget=config.GEMINI_THINKING_BUDGET)
-    plain = gen_config.model_copy(update={"thinking_config": None})  # for models that reject a thinking budget
+    # Callers' configs are reused across steps, so never modify them; add our thinking budget to a copy.
+    plain = gen_config
+    fast = plain.thinking_config is None
+    tuned = plain.model_copy(update={"thinking_config": types.ThinkingConfig(
+        thinking_budget=config.GEMINI_THINKING_BUDGET)}) if fast else plain
     client = get_client()
     last = None
     for model in config.GEMINI_MODELS:
-        cfg, attempt = gen_config, 0
+        cfg, attempt = tuned, 0
         while True:
             try:
                 return client.models.generate_content(model=model, contents=contents, config=cfg)
             except errors.APIError as e:
                 last = e
-                if e.code == 400 and fast and cfg is gen_config:
+                if e.code == 400 and fast and cfg is tuned:  # some models reject a thinking budget
                     cfg = plain
                     continue
                 daily_quota = e.code == 429 and "quota" in str(e).lower()

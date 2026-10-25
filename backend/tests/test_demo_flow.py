@@ -222,3 +222,29 @@ def test_demo_reset(client):
     h, _ = login(client, "sarah")
     nn = client.get("/api/clubs/1/events/1", headers=h).json()
     assert nn["readiness"]["score"] == 75
+
+
+def test_gemini_fallback_chain(monkeypatch):
+    from google.genai import errors
+    from app import config
+
+    calls = []
+
+    class FakeModels:
+        def generate_content(self, model, contents, config):
+            calls.append((model, config.thinking_config is not None))
+            if model != "lite":
+                raise errors.APIError(429, {"error": {"message": "You exceeded your current quota",
+                                                      "status": "RESOURCE_EXHAUSTED"}})
+            if config.thinking_config is not None:
+                raise errors.APIError(400, {"error": {"message": "invalid argument", "status": "INVALID_ARGUMENT"}})
+            return SimpleNamespace(text="ok")
+
+    monkeypatch.setattr(ai, "get_client", lambda: SimpleNamespace(models=FakeModels()))
+    monkeypatch.setattr(config, "GEMINI_MODELS", ["main", "backup", "lite"])
+    shared = types.GenerateContentConfig()
+    for _ in range(2):  # the assistant reuses one config across steps
+        assert ai.generate("hi", shared).text == "ok"
+    assert shared.thinking_config is None
+    # quota errors skip straight to the next model (no retries), lite retries without a thinking budget
+    assert calls == [("main", True), ("backup", True), ("lite", True), ("lite", False)] * 2
