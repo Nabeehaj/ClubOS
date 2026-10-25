@@ -42,7 +42,7 @@ uvicorn app.main:app --reload
 | Vendors | `GET /vendors` | `POST /vendors`, `PATCH /vendors/{id}` |
 | Email generator | `GET /emails/templates`, `GET /emails/drafts` | `POST /emails/generate`, `POST /emails/polish` (AI), `POST /emails/mailto`, `POST /emails/drafts` |
 | Members | `GET /members`, `GET /members/{user_id}` | — |
-| AI Assistant panel | `GET /agent/status` | `POST /agent/chat`, `POST /agent/actions/{id}/confirm`, `.../reject` |
+| AI Assistant panel | `GET /agent/status` | `POST /agent/chat`, `POST /agent/actions/{id}/confirm`, `POST /agent/actions/confirm` (Confirm all), `.../reject` |
 
 (All paths above are relative to `/api/clubs/{club_id}`.)
 

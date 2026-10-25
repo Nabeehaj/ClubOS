@@ -3094,6 +3094,61 @@
         }
       }
     },
+    "/api/clubs/{club_id}/agent/actions/confirm": {
+      "post": {
+        "tags": [
+          "ai agent"
+        ],
+        "summary": "Apply several proposed changes (Confirm all)",
+        "operationId": "confirm_many_api_clubs__club_id__agent_actions_confirm_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmMany"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{club_id}/agent/actions/{action_id}/reject": {
       "post": {
         "tags": [
@@ -3361,6 +3416,24 @@
           "text"
         ],
         "title": "ChatTurn"
+      },
+      "ConfirmMany": {
+        "properties": {
+          "action_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Action Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action_ids"
+        ],
+        "title": "ConfirmMany"
       },
       "DraftIn": {
         "properties": {
@@ -3844,14 +3917,26 @@
             "title": "Meeting Date"
           },
           "meeting_time": {
-            "type": "string",
-            "title": "Meeting Time",
-            "default": "7:00 PM"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meeting Time"
           },
           "meeting_location": {
-            "type": "string",
-            "title": "Meeting Location",
-            "default": "SAC Room 302"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meeting Location"
           },
           "extra_note": {
             "type": "string",
