@@ -399,6 +399,6 @@ Built for a Stony Brook University hackathon.
 |---|---|
 | Backend, API and AI assistant | [@Nabeehaj](https://github.com/Nabeehaj) |
 | Frontend and UI/UX | [@dan-daniyaal](https://github.com/dan-daniyaal) |
-| Club data and SQL | [@sanjuna8]((https://github.com/sanjuna8) |
+| Club data and SQL | [@sanjuna8](https://github.com/sanjuna8) |
 
 Questions or ideas? [Open an issue](https://github.com/Nabeehaj/ClubOS/issues).
