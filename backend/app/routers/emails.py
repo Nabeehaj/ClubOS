@@ -1,5 +1,5 @@
 """Email templates filled from event data. Emails are not sent; responses include a mailto link."""
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Literal, Optional
 from urllib.parse import quote
 
@@ -32,8 +32,8 @@ class GenerateIn(BaseModel):
     event_id: Optional[int] = None
     vendor_id: Optional[int] = None
     meeting_date: Optional[date] = None
-    meeting_time: str = "7:00 PM"
-    meeting_location: str = "SAC Room 302"
+    meeting_time: Optional[str] = None  # defaults to the club's meeting time
+    meeting_location: Optional[str] = None
     extra_note: str = Field(default="", max_length=1000)
 
 
@@ -55,6 +55,15 @@ def mailto(to: str, subject: str, body: str) -> str:
     return f"mailto:{quote(to, safe='@,')}?subject={quote(subject)}&body={quote(body)}"
 
 
+def next_meeting_day(day_name: Optional[str]) -> date:
+    """Next date (today included) that falls on the club's meeting weekday, or today if it has none."""
+    today = date.today()
+    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    if not day_name or day_name.lower() not in days:
+        return today
+    return today + timedelta(days=(days.index(day_name.lower()) - today.weekday()) % 7)
+
+
 def fmt_date(d: date) -> str:
     return d.strftime("%A, %B ") + str(d.day)
 
@@ -71,7 +80,9 @@ def build_email(session: Session, club: Club, sender: User, position: str, body:
     note = f"\n\n{body.extra_note.strip()}" if body.extra_note.strip() else ""
 
     if body.template == "meeting_reminder":
-        when = body.meeting_date or date.today()
+        when = body.meeting_date or next_meeting_day(club.meeting_day)
+        time_ = body.meeting_time or club.meeting_time or "7:00 PM"
+        place = body.meeting_location or club.meeting_location or "SAC Room 302"
         open_tasks = session.exec(select(Task).where(Task.club_id == club.id, Task.status != "Completed")
                                   .order_by(Task.due_date).limit(5)).all()
         upcoming = session.exec(select(Event).where(Event.club_id == club.id, Event.date >= date.today())
@@ -83,7 +94,7 @@ def build_email(session: Session, club: Club, sender: User, position: str, body:
             "to": ", ".join(u.email for u, _ in board(session, club.id)),
             "subject": f"Reminder: {club.name} board meeting – {fmt_date(when)}",
             "body": (f"Hi team,\n\nQuick reminder that our board meeting is on {fmt_date(when)} at "
-                     f"{body.meeting_time} in {body.meeting_location}.\n\nAgenda:\n{agenda or '  • Open discussion'}"
+                     f"{time_} in {place}.\n\nAgenda:\n{agenda or '  • Open discussion'}"
                      f"\n\nOpen tasks to update us on:\n{tasks or '  • None – nice work!'}{note}{sign}"),
         }
 

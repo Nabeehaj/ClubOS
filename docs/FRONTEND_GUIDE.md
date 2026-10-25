@@ -17,7 +17,7 @@ uvicorn app.main:app --reload
 - API: `http://localhost:8000`
 - Interactive docs: `http://localhost:8000/docs` (use *Authorize* to log in with a demo account).
 - Full machine-readable spec: [`openapi.json`](openapi.json) (you can generate a typed client from it).
-- Demo logins: [`demo-accounts.csv`](demo-accounts.csv). Main demo user: `sarah@sbu.clubos` / `Sarah!Tech2026`.
+- Demo logins: [`demo-accounts.csv`](demo-accounts.csv). Main demo user: `eduardo.lozanonaranjo@stonybrook.edu` / `Sbcs!President26` (SBCS President).
 
 ## Basics
 
@@ -49,7 +49,7 @@ uvicorn app.main:app --reload
 ## Things the UI should know
 
 - **Chat is polling, not websockets.** Every ~3 s call `GET /channels/{id}/messages?after_id=<last id you have>` and append.
-  Messages with `is_bot: true` come from ClubOS (e.g. "Sarah turned a message into a task").
+  Messages with `is_bot: true` come from ClubOS (e.g. "Eduardo Lozano turned a message into a task").
 - **Message → task:** every field is optional. With an empty body `{}` the message text becomes the title, the
   message author becomes the assignee, and the channel's event is linked.
 - **Finance permissions:** only President/Treasurer may change money. Use `can_manage_finance` (in login `clubs[]`,
@@ -72,7 +72,7 @@ uvicorn app.main:app --reload
 
 ## Demo script
 
-1. Log in as Sarah → Dashboard (stats, upcoming events, pending tasks).
+1. Log in as Eduardo (SBCS President) → Dashboard (stats, upcoming events, pending tasks).
 2. Open **Fall Tech Networking Night** → workspace (8 tasks, 5 done, readiness 75%).
 3. Assign a task to a board member.
 4. ClubChat `#event-planning` → send a message → "Make task".

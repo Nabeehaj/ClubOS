@@ -10,6 +10,17 @@ import { LogoMark, Wordmark } from '@/components/Logo'
 import { spring } from '@/lib/motion'
 
 function ClubBadge({ club, size = 28 }) {
+  if (club?.logo_url) {
+    return (
+      <img
+        src={club.logo_url}
+        alt=""
+        aria-hidden
+        className="shrink-0 rounded-md bg-white object-contain"
+        style={{ width: size, height: size }}
+      />
+    )
+  }
   const letters = (club?.name ?? '?')
     .replace(/^SBU\s+/i, '')
     .split(/\s+/)

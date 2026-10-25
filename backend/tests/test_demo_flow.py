@@ -33,7 +33,7 @@ def test_every_demo_account_can_log_in(client):
     for key in DEMO_USERS:
         _, data = login(client, key)
         assert data["clubs"], f"{key} is on no club"
-    r = client.post("/api/auth/login", json={"email": "sarah@sbu.clubos", "password": "nope"})
+    r = client.post("/api/auth/login", json={"email": "eduardo.lozanonaranjo@stonybrook.edu", "password": "nope"})
     assert r.status_code == 401
 
 
@@ -44,13 +44,13 @@ def test_requires_login_and_membership(client):
 
 
 def test_full_demo_flow(client):
-    h, data = login(client, "sarah")
+    h, data = login(client, "eduardo")
     club_id = data["default_club_id"]
     base = f"/api/clubs/{club_id}"
 
     # 1. dashboard
     dash = client.get(f"{base}/dashboard", headers=h).json()
-    assert dash["club"]["name"] == "SBU Tech Society"
+    assert dash["club"]["name"] == "Stony Brook Computing Society (SBCS)"
     assert dash["stats"]["board_members"] == 7
     nn = next(e for e in dash["upcoming_events"] if e["name"] == "Fall Tech Networking Night")
     assert nn["task_progress"] == {"completed": 5, "total": 8}
@@ -65,10 +65,10 @@ def test_full_demo_flow(client):
 
     # 3. assign a task
     members = client.get(f"{base}/members", headers=h).json()
-    james = next(m for m in members if m["name"] == "James Wilson")
+    james = next(m for m in members if m["name"] == "SBCS Secretary")
     open_task = next(t for t in ws["tasks"] if t["status"] != "Completed")
     r = client.patch(f"{base}/tasks/{open_task['id']}", headers=h, json={"assignee_id": james["id"]})
-    assert r.json()["assignee"]["name"] == "James Wilson"
+    assert r.json()["assignee"]["name"] == "SBCS Secretary"
 
     # 4. chat message -> task
     channel_id = ws["channel"]["id"]
@@ -110,28 +110,31 @@ def test_full_demo_flow(client):
 
 
 def test_finance_is_president_or_treasurer_only(client):
-    h, _ = login(client, "daniel")  # Marketing Chair
+    h, _ = login(client, "sbcs_brand")  # Brand Manager, no finance role
     r = client.post("/api/clubs/1/finance/expenses", headers=h,
                     json={"category_id": 1, "description": "x", "amount": 5})
     assert r.status_code == 403
-    h, _ = login(client, "emily")  # Treasurer
+    h, _ = login(client, "sbcs_treasurer")  # Treasurer
     r = client.post("/api/clubs/1/finance/expenses", headers=h,
                     json={"category_id": 1, "description": "Tape", "amount": 5})
     assert r.status_code == 201
 
 
 def test_other_templates_and_club_switching(client):
-    h, data = login(client, "aisha")
-    assert {c["name"] for c in data["clubs"]} == {"SBU Tech Society", "SBU Design & Media Collective"}
+    _, data = login(client, "marcus")
+    assert {c["name"] for c in data["clubs"]} == {"SBU Robotics Club", "SBU Design & Media Collective"}
+    h, data = login(client, "eduardo")
+    assert data["clubs"][0]["logo_url"] == "/clubs/sbcs.png"
     r = client.post("/api/clubs/1/emails/generate", headers=h,
                     json={"template": "catering_quote", "event_id": 1, "vendor_id": 1})
     assert r.status_code == 200 and "orders@campusbites.example" in r.json()["to"]
     r = client.post("/api/clubs/1/emails/generate", headers=h, json={"template": "meeting_reminder"})
-    assert "sarah@sbu.clubos" in r.json()["to"]
+    assert "eduardo.lozanonaranjo@stonybrook.edu" in r.json()["to"]
+    assert "5:00 PM - 6:00 PM" in r.json()["body"] and "Monday" in r.json()["subject"]
 
 
 def test_ai_unavailable_without_key(client):
-    h, _ = login(client, "sarah")
+    h, _ = login(client, "eduardo")
     assert client.get("/api/clubs/1/agent/status", headers=h).json()["available"] is False
     r = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "hi"})
     assert r.status_code == 503
@@ -160,10 +163,10 @@ def test_agent_plans_event_and_confirm_all(client, monkeypatch):
                 {"title": "Print name tags", "assignee_id": 4, "event_id": 2, "priority": "Low"},
                 {"title": "Bad one", "assignee_id": 999}])]),
             _stub_reply(text="I proposed 2 tasks for the AI Workshop."))
-    h, _ = login(client, "sarah")
+    h, _ = login(client, "eduardo")
     out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "Plan the AI Workshop"}).json()
     assert out["tools_used"] == ["get_event", "member_workload", "propose_create_tasks"]
-    assert len(out["proposals"]) == 2 and "Daniel Lee" in out["proposals"][0]["summary"]
+    assert len(out["proposals"]) == 2 and "SBCS Brand Manager" in out["proposals"][0]["summary"]
     assert all(p["can_confirm"] and p["requires_role"] is None for p in out["proposals"])
 
     before = len(client.get("/api/clubs/1/tasks?event_id=2", headers=h).json())
@@ -176,7 +179,7 @@ def test_agent_plans_event_and_confirm_all(client, monkeypatch):
 
 
 def test_agent_bulk_update_delete_and_chat(client, monkeypatch):
-    h, _ = login(client, "sarah")
+    h, _ = login(client, "eduardo")
     tasks = client.get("/api/clubs/1/tasks?assignee_id=6&status=To%20Do", headers=h).json()
     assert tasks
     victim = client.post("/api/clubs/1/tasks", headers=h, json={"title": "Temp task"}).json()
@@ -202,7 +205,7 @@ def test_agent_money_needs_finance_role(client, monkeypatch):
     proposal_calls = [_call("propose_add_expense", category_id=2, description="Pizza deposit", amount=80, event_id=1),
                       _call("propose_advance_approval", system="sb_engaged", record_id=2)]
     _script(monkeypatch, _stub_reply(calls=proposal_calls), _stub_reply(text="Proposed."))
-    h, _ = login(client, "daniel")  # Marketing Chair
+    h, _ = login(client, "sbcs_brand")  # Brand Manager, no finance role
     out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "log pizza, push SBE"}).json()
     expense = next(p for p in out["proposals"] if p["kind"] == "add_expense")
     step = next(p for p in out["proposals"] if p["kind"] == "advance_approval")
@@ -211,15 +214,15 @@ def test_agent_money_needs_finance_role(client, monkeypatch):
     assert client.post(f"/api/clubs/1/agent/actions/{expense['id']}/confirm", headers=h).status_code == 403
     assert client.post(f"/api/clubs/1/agent/actions/{step['id']}/confirm", headers=h).json()["record"]["status"]         == "Pending"
 
-    h, _ = login(client, "emily")  # Treasurer can confirm the same card
+    h, _ = login(client, "sbcs_treasurer")  # Treasurer can confirm the same card
     done = client.post(f"/api/clubs/1/agent/actions/{expense['id']}/confirm", headers=h).json()
     assert done["expense"]["amount"] == 80 and done["budget"]["spent"] > 0
 
 
 def test_demo_reset(client):
-    h, _ = login(client, "sarah")
+    h, _ = login(client, "eduardo")
     assert client.post("/api/demo/reset", headers=h).json()["reset"] is True
-    h, _ = login(client, "sarah")
+    h, _ = login(client, "eduardo")
     nn = client.get("/api/clubs/1/events/1", headers=h).json()
     assert nn["readiness"]["score"] == 75
 

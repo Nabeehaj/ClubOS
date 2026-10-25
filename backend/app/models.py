@@ -40,6 +40,9 @@ class Club(SQLModel, table=True):
     email: Optional[str] = None
     logo_url: Optional[str] = None
     accent_color: Optional[str] = None
+    meeting_day: Optional[str] = None  # e.g. "Monday"
+    meeting_time: Optional[str] = None  # e.g. "5:00 PM - 6:00 PM"
+    meeting_location: Optional[str] = None
 
 
 class Membership(SQLModel, table=True):

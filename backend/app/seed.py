@@ -1,6 +1,8 @@
-"""Fictional demo data. Run `python -m app.seed` to reset the database.
+"""Demo data. Run `python -m app.seed` to reset the database.
 
-People, emails, vendors and 25Live / SB Engaged / NXT records are fictional or simulated.
+The main club is the Stony Brook Computing Society (SBCS). Its president is real (provided by the club data
+partner); the other SBCS seats are role placeholders until the real board is known. The Robotics and Design
+clubs, their people, vendors, and all 25Live / SB Engaged / NXT records are fictional or simulated.
 """
 from datetime import date, datetime, timedelta
 from urllib.parse import quote
@@ -16,9 +18,15 @@ from .models import (
 
 # key: (name, email, password, major, class_year)
 DEMO_USERS = {
-    "sarah": ("Sarah Chen", "sarah@sbu.clubos", "Sarah!Tech2026", "Computer Science", 2027),
+    "eduardo": ("Eduardo Lozano", "eduardo.lozanonaranjo@stonybrook.edu", "Sbcs!President26", "Computer Science",
+                None),
+    "sbcs_vp": ("SBCS Vice President", "sbcs.vp@sbu.clubos", "Sbcs#VicePres26", None, None),
+    "sbcs_treasurer": ("SBCS Treasurer", "sbcs.treasurer@sbu.clubos", "Sbcs$Treasury26", None, None),
+    "sbcs_secretary": ("SBCS Secretary", "sbcs.secretary@sbu.clubos", "Sbcs&Minutes26", None, None),
+    "sbcs_community": ("SBCS Community Chair", "sbcs.community@sbu.clubos", "Sbcs*Community26", None, None),
+    "sbcs_brand": ("SBCS Brand Manager", "sbcs.brand@sbu.clubos", "Sbcs^Brand26", None, None),
+    "sbcs_social": ("SBCS Social Media Manager", "sbcs.social@sbu.clubos", "Sbcs@Social26", None, None),
     "adam": ("Adam Khan", "adam@sbu.clubos", "Adam#VicePres26", "Applied Math & Statistics", 2027),
-    "emily": ("Emily Park", "emily@sbu.clubos", "Emily$Treasury26", "Business Management", 2026),
     "james": ("James Wilson", "james@sbu.clubos", "James&Minutes26", "Information Systems", 2028),
     "aisha": ("Aisha Rahman", "aisha@sbu.clubos", "Aisha*Events26", "Computer Engineering", 2027),
     "daniel": ("Daniel Lee", "daniel@sbu.clubos", "Daniel^Design26", "Digital Arts", 2026),
@@ -29,9 +37,12 @@ DEMO_USERS = {
 }
 
 DEMO_CLUBS = {
-    "tech": dict(name="SBU Tech Society", slug="sbu-tech-society", category="Academic / Professional",
-                 description="A student organization focused on technology, innovation, and networking.",
-                 member_count=120, annual_budget=5000, email="techsociety@sbu.clubos", accent_color="#6C5CE7"),
+    "tech": dict(name="Stony Brook Computing Society (SBCS)", slug="sbcs", category="CEAS",
+                 description="Student-run club connecting Stony Brook students interested in tech to the tech "
+                             "industry through workshops, networking and social events. Official ACM chapter.",
+                 member_count=120, annual_budget=8500, email="sbcomputingsociety@cs.stonybrook.edu",
+                 accent_color="#1E88E5", logo_url="/clubs/sbcs.png",
+                 meeting_day="Monday", meeting_time="5:00 PM - 6:00 PM"),
     "robotics": dict(name="SBU Robotics Club", slug="sbu-robotics", category="Engineering",
                      description="Designing, building, and battling robots, from first Arduino to competition bots.",
                      member_count=65, annual_budget=3500, email="robotics@sbu.clubos", accent_color="#00B894"),
@@ -42,13 +53,13 @@ DEMO_CLUBS = {
 
 DEMO_BOARDS = {
     "tech": [
-        ("sarah", "President", ["Runs board meetings", "SB Engaged registrations", "Club strategy"]),
-        ("adam", "Vice President", ["Speaker & sponsor outreach", "Backs up the President"]),
-        ("emily", "Treasurer", ["Budget & NXT requests", "Vendor quotes", "Reimbursements"]),
-        ("james", "Secretary", ["Meeting minutes", "RSVPs & attendance", "Merch orders"]),
-        ("aisha", "Events Chair", ["Room reservations (25Live)", "Event logistics", "Day-of coordination"]),
-        ("daniel", "Marketing Chair", ["Flyers & social media", "Photography", "Branding"]),
-        ("priya", "Outreach Chair", ["Partner clubs", "Equipment & tech setup"]),
+        ("eduardo", "President", ["Runs GBMs and board meetings", "SB Engaged registrations", "Club strategy"]),
+        ("sbcs_vp", "Vice President", ["Industry speakers & sponsors", "Backs up the President"]),
+        ("sbcs_treasurer", "Treasurer", ["Budget & NXT requests", "Vendor quotes", "Reimbursements"]),
+        ("sbcs_secretary", "Secretary", ["Meeting minutes", "RSVPs & attendance", "Merch orders"]),
+        ("sbcs_community", "Community Chair", ["Mixers & socials", "Room reservations (25Live)", "Day-of logistics"]),
+        ("sbcs_brand", "Brand Manager", ["Flyers & design", "Photography", "Branding"]),
+        ("sbcs_social", "Social Media Manager", ["Instagram & Discord", "Partner clubs", "Tech setup"]),
     ],
     "robotics": [
         ("priya", "President", ["Leads build season", "SB Engaged registrations"]),
@@ -123,19 +134,19 @@ def _messages(session: Session, channel: Channel, users: dict, rows: list[tuple]
 
 def seed_tech(session: Session, club: Club, u: dict) -> None:
     nn = Event(club_id=club.id, name="Fall Tech Networking Night", date=d(11, 5), start_time="18:00",
-               end_time="21:00", location="SAC Ballroom A", lead_id=u["aisha"].id, budget=1500,
+               end_time="21:00", location="SAC Ballroom A", lead_id=u["sbcs_community"].id, budget=1500,
                expected_attendance=150, status="Planning",
                description="Meet engineers and recruiters from Long Island and NYC tech companies. Lightning talks, "
                            "resume table, and food. Business casual.")
     ai = Event(club_id=club.id, name="AI Workshop", date=d(11, 12), start_time="17:00", end_time="19:00",
-               location="Frey Hall 102", lead_id=u["adam"].id, budget=500, expected_attendance=60,
+               location="Frey Hall 102", lead_id=u["sbcs_vp"].id, budget=500, expected_attendance=60,
                status="Awaiting Approval",
                description="Hands-on intro to building with AI APIs. Bring a laptop; no experience needed.")
     hs = Event(club_id=club.id, name="Hackathon Social", date=d(11, 20), start_time="19:00", end_time="22:00",
-               location="SAC Meeting Room 2", lead_id=u["aisha"].id, budget=800, expected_attendance=40,
+               location="SAC Meeting Room 2", lead_id=u["sbcs_community"].id, budget=800, expected_attendance=40,
                status="Confirmed", description="Find teammates for spring hackathons over pizza and games.")
     eos = Event(club_id=club.id, name="End-of-Semester Celebration", date=d(12, 4), start_time="18:30",
-                end_time="21:30", location="SAC Auditorium", lead_id=u["sarah"].id, budget=1200,
+                end_time="21:30", location="SAC Auditorium", lead_id=u["eduardo"].id, budget=1200,
                 expected_attendance=100, status="Planning",
                 description="Celebrate the semester with food, a DJ, awards, and a photo slideshow.")
     session.add_all([nn, ai, hs, eos])
@@ -143,30 +154,30 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
 
     tasks = _tasks(session, club, u, [
         # Fall Tech Networking Night: 8 tasks, 5 completed
-        ("Reserve SAC Ballroom", "aisha", "Completed", "High", d(10, 10), nn, "Submit via 25Live, 150 capacity."),
-        ("Submit SB Engaged form", "sarah", "In Progress", "High", d(10, 27), nn, "Speaker list still missing."),
-        ("Contact catering vendor", "emily", "To Do", "High", d(10, 28), nn, "Get a quote from Campus Bites."),
-        ("Design event flyer", "daniel", "Completed", "Medium", d(10, 15), nn, ""),
-        ("Send speaker invitations", "adam", "In Progress", "High", d(10, 26), nn, "3 of 5 speakers confirmed."),
-        ("Prepare event budget", "emily", "Completed", "Medium", d(10, 12), nn, ""),
-        ("Post flyer on Instagram & Discord", "daniel", "Completed", "Low", d(10, 18), nn, ""),
-        ("Create RSVP form", "james", "Completed", "Medium", d(10, 14), nn, ""),
+        ("Reserve SAC Ballroom", "sbcs_community", "Completed", "High", d(10, 10), nn, "Submit via 25Live, 150 capacity."),
+        ("Submit SB Engaged form", "eduardo", "In Progress", "High", d(10, 27), nn, "Speaker list still missing."),
+        ("Contact catering vendor", "sbcs_treasurer", "To Do", "High", d(10, 28), nn, "Get a quote from Campus Bites."),
+        ("Design event flyer", "sbcs_brand", "Completed", "Medium", d(10, 15), nn, ""),
+        ("Send speaker invitations", "sbcs_vp", "In Progress", "High", d(10, 26), nn, "3 of 5 speakers confirmed."),
+        ("Prepare event budget", "sbcs_treasurer", "Completed", "Medium", d(10, 12), nn, ""),
+        ("Post flyer on Instagram & Discord", "sbcs_brand", "Completed", "Low", d(10, 18), nn, ""),
+        ("Create RSVP form", "sbcs_secretary", "Completed", "Medium", d(10, 14), nn, ""),
         # AI Workshop
-        ("Confirm workshop instructor", "adam", "In Progress", "High", d(10, 30), ai, ""),
-        ("Check outlets & laptops in Frey Hall", "priya", "To Do", "Medium", d(11, 5), ai, ""),
-        ("Write workshop description for SB Engaged", "sarah", "Completed", "Medium", d(10, 20), ai, ""),
-        ("Prepare starter notebook", "adam", "To Do", "Medium", d(11, 9), ai, ""),
+        ("Confirm workshop instructor", "sbcs_vp", "In Progress", "High", d(10, 30), ai, ""),
+        ("Check outlets & laptops in Frey Hall", "sbcs_social", "To Do", "Medium", d(11, 5), ai, ""),
+        ("Write workshop description for SB Engaged", "eduardo", "Completed", "Medium", d(10, 20), ai, ""),
+        ("Prepare starter notebook", "sbcs_vp", "To Do", "Medium", d(11, 9), ai, ""),
         # Hackathon Social
-        ("Order pizza for Hackathon Social", "emily", "To Do", "Medium", d(11, 14), hs, ""),
-        ("Order merchandise (stickers & lanyards)", "james", "To Do", "Medium", d(11, 6), hs, ""),
-        ("Plan icebreaker games", "aisha", "Completed", "Low", d(10, 22), hs, ""),
-        ("Finish 25Live request for meeting room", "aisha", "In Progress", "High", d(11, 2), hs, ""),
+        ("Order pizza for Hackathon Social", "sbcs_treasurer", "To Do", "Medium", d(11, 14), hs, ""),
+        ("Order merchandise (stickers & lanyards)", "sbcs_secretary", "To Do", "Medium", d(11, 6), hs, ""),
+        ("Plan icebreaker games", "sbcs_community", "Completed", "Low", d(10, 22), hs, ""),
+        ("Finish 25Live request for meeting room", "sbcs_community", "In Progress", "High", d(11, 2), hs, ""),
         # End-of-Semester Celebration
-        ("Book a DJ", "aisha", "To Do", "Medium", d(11, 15), eos, ""),
-        ("Collect photo highlights for slideshow", "daniel", "To Do", "Low", d(11, 28), eos, ""),
+        ("Book a DJ", "sbcs_community", "To Do", "Medium", d(11, 15), eos, ""),
+        ("Collect photo highlights for slideshow", "sbcs_brand", "To Do", "Low", d(11, 28), eos, ""),
         # general
-        ("Update club constitution", "james", "In Progress", "Low", d(11, 10), None, ""),
-        ("Draft spring semester calendar", "sarah", "To Do", "Medium", d(11, 18), None, ""),
+        ("Update club constitution", "sbcs_secretary", "In Progress", "Low", d(11, 10), None, ""),
+        ("Draft spring semester calendar", "eduardo", "To Do", "Medium", d(11, 18), None, ""),
     ])
     session.flush()
 
@@ -179,28 +190,28 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
     session.add_all([general, board_ch, planning, finance])
     session.flush()
     _messages(session, general, u, [
-        ("sarah", "Welcome back everyone! Fall Tech Networking Night is Nov 5, save the date.", 70),
-        ("daniel", "Flyers are up on Instagram and the SAC boards!", 50),
-        ("priya", "Robotics Club wants to co-promote the AI Workshop, any objections?", 26),
-        ("adam", "Love that, let's do it.", 25),
+        ("eduardo", "Welcome back everyone! Fall Tech Networking Night is Nov 5, save the date.", 70),
+        ("sbcs_brand", "Flyers are up on Instagram and the SAC boards!", 50),
+        ("sbcs_social", "Robotics Club wants to co-promote the AI Workshop, any objections?", 26),
+        ("sbcs_vp", "Love that, let's do it.", 25),
     ])
     _messages(session, board_ch, u, [
-        ("sarah", "Board meeting Thursday 7pm in SAC 302. Please update your tasks before then.", 30),
-        ("james", "I'll send minutes from last week tonight.", 29),
-        ("emily", "Reminder: NXT requests need 2 weeks lead time.", 8),
+        ("eduardo", "Board meeting Thursday 7pm in SAC 302. Please update your tasks before then.", 30),
+        ("sbcs_secretary", "I'll send minutes from last week tonight.", 29),
+        ("sbcs_treasurer", "Reminder: NXT requests need 2 weeks lead time.", 8),
     ])
     _messages(session, planning, u, [
-        ("sarah", "Hey everyone! We need to finalize the networking night details.", 20),
-        ("aisha", "I've completed the room reservation checklist. Ballroom A is confirmed in 25Live.", 19),
-        ("emily", "I'll contact the catering vendor today.", 18),
-        ("daniel", "The promotional flyer is ready for review!", 17),
-        ("adam", "3 of 5 speakers confirmed, waiting on two replies.", 6),
-        ("sarah", "Can someone order name tags and lanyards for networking night?", 2),
+        ("eduardo", "Hey everyone! We need to finalize the networking night details.", 20),
+        ("sbcs_community", "I've completed the room reservation checklist. Ballroom A is confirmed in 25Live.", 19),
+        ("sbcs_treasurer", "I'll contact the catering vendor today.", 18),
+        ("sbcs_brand", "The promotional flyer is ready for review!", 17),
+        ("sbcs_vp", "3 of 5 speakers confirmed, waiting on two replies.", 6),
+        ("eduardo", "Can someone order name tags and lanyards for networking night?", 2),
     ])
     _messages(session, finance, u, [
-        ("emily", "Catering request for Networking Night is pending in NXT ($450).", 22),
-        ("emily", "Decorations request got approved", 10),
-        ("sarah", "Nice! How much is left in the events budget?", 9),
+        ("sbcs_treasurer", "Catering request for Networking Night is pending in NXT ($450).", 22),
+        ("sbcs_treasurer", "Decorations request got approved", 10),
+        ("eduardo", "Nice! How much is left in the events budget?", 9),
     ])
 
     # simulated 25Live
@@ -239,7 +250,7 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
 
     # budget
     cats = {name: BudgetCategory(club_id=club.id, name=name, planned=amt) for name, amt in [
-        ("Events", 2000), ("Food & Catering", 1000), ("Merchandise", 750), ("Marketing", 250), ("Equipment", 500)]}
+        ("Events", 3500), ("Food & Catering", 2000), ("Merchandise", 1000), ("Marketing", 500), ("Equipment", 1000)]}
     session.add_all(cats.values())
 
     # sample vendors
@@ -277,12 +288,12 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
 
     # expenses
     for cat, desc, amt, when, ev, vend, who in [
-        ("Food & Catering", "Welcome meeting pizza", 220, d(9, 10), None, None, "emily"),
-        ("Marketing", "Networking Night flyer printing", 45, d(10, 16), nn, None, "emily"),
-        ("Marketing", "Instagram promo boost", 30, d(10, 18), nn, None, "sarah"),
-        ("Events", "Ballroom decorations", 150, d(10, 21), nn, None, "emily"),
-        ("Equipment", "HDMI adapters for workshop", 60, d(10, 22), ai, None, "emily"),
-        ("Merchandise", "Sticker sample pack", 35, d(10, 19), hs, v["print"], "emily"),
+        ("Food & Catering", "Welcome meeting pizza", 220, d(9, 10), None, None, "sbcs_treasurer"),
+        ("Marketing", "Networking Night flyer printing", 45, d(10, 16), nn, None, "sbcs_treasurer"),
+        ("Marketing", "Instagram promo boost", 30, d(10, 18), nn, None, "eduardo"),
+        ("Events", "Ballroom decorations", 150, d(10, 21), nn, None, "sbcs_treasurer"),
+        ("Equipment", "HDMI adapters for workshop", 60, d(10, 22), ai, None, "sbcs_treasurer"),
+        ("Merchandise", "Sticker sample pack", 35, d(10, 19), hs, v["print"], "sbcs_treasurer"),
     ]:
         session.add(Expense(club_id=club.id, category_id=cats[cat].id, description=desc, amount=amt, spent_on=when,
                             event_id=ev.id if ev else None, vendor_id=vend.id if vend else None,
@@ -304,13 +315,13 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
 
     # activity feed
     for who, text, kind, ev, hours in [
-        ("aisha", "Aisha Rahman completed \"Reserve SAC Ballroom\"", "task", nn, 72),
+        ("sbcs_community", f"{u["sbcs_community"].name} completed \"Reserve SAC Ballroom\"", "task", nn, 72),
         (None, "25Live (simulated): SAC Ballroom A for \"Fall Tech Networking Night\" is now Approved", "approval", nn, 71),
-        ("daniel", "Daniel Lee completed \"Design event flyer\"", "task", nn, 50),
-        ("sarah", "Sarah Chen submitted SB Engaged registration for \"Fall Tech Networking Night\"", "approval", nn, 40),
-        ("emily", "Emily Park added a $150.00 expense: Ballroom decorations (Events)", "finance", nn, 30),
-        ("emily", "NXT (simulated): \"Networking Night decorations\" is now Approved", "finance", nn, 10),
-        ("adam", "Adam Khan moved to In Progress: \"Send speaker invitations\"", "task", nn, 6),
+        ("sbcs_brand", f"{u["sbcs_brand"].name} completed \"Design event flyer\"", "task", nn, 50),
+        ("eduardo", f"{u["eduardo"].name} submitted SB Engaged registration for \"Fall Tech Networking Night\"", "approval", nn, 40),
+        ("sbcs_treasurer", f"{u["sbcs_treasurer"].name} added a $150.00 expense: Ballroom decorations (Events)", "finance", nn, 30),
+        ("sbcs_treasurer", "NXT (simulated): \"Networking Night decorations\" is now Approved", "finance", nn, 10),
+        ("sbcs_vp", f"{u["sbcs_vp"].name} moved to In Progress: \"Send speaker invitations\"", "task", nn, 6),
     ]:
         session.add(Activity(club_id=club.id, actor_id=u[who].id if who else None, text=text, kind=kind,
                              event_id=ev.id, created_at=ago(hours=hours)))
@@ -319,9 +330,9 @@ def seed_tech(session: Session, club: Club, u: dict) -> None:
     # email drafts
     from .routers.emails import GenerateIn, build_email
     for who, pos, req in [
-        ("aisha", "Events Chair", GenerateIn(template="event_invitation", event_id=nn.id)),
-        ("emily", "Treasurer", GenerateIn(template="catering_quote", event_id=nn.id, vendor_id=v["bites"].id)),
-        ("sarah", "President", GenerateIn(template="meeting_reminder", meeting_date=d(10, 29))),
+        ("sbcs_community", "Community Chair", GenerateIn(template="event_invitation", event_id=nn.id)),
+        ("sbcs_treasurer", "Treasurer", GenerateIn(template="catering_quote", event_id=nn.id, vendor_id=v["bites"].id)),
+        ("eduardo", "President", GenerateIn(template="meeting_reminder")),
     ]:
         email = build_email(session, club, u[who], pos, req)
         session.add(EmailDraft(club_id=club.id, event_id=req.event_id, template=req.template,
