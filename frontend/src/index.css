@@ -46,6 +46,46 @@
   --accent: #a8422d;
   --line: #e5e0d6;
   --line-strong: #cfc7b9;
+  --sidebar-bg: #fbfaf6;
+  --topbar-bg: rgb(251 250 246 / 0.91);
+  --panel-shadow: rgb(39 45 36 / 0.045);
+}
+
+/* Dark mode: same warm palette, lights off. Set by lib/theme.js on <html data-theme="dark">. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-ink-950: #121614;
+  --color-ink-900: #191e1b;
+  --color-ink-850: #1e2420;
+  --color-ink-800: #262d29;
+  --color-ink-700: #303833;
+  --color-ink-600: #3d4641;
+
+  --color-line: #2b332e;
+  --color-line-strong: #3c4640;
+
+  --color-fg: #e7ebe6;
+  --color-muted: #aab4ae;
+  --color-faint: #8b9690;
+
+  --color-violet: #9aa59d;
+  --color-violet-soft: #b6c0b9;
+  --color-cyan: #7db2b9;
+
+  --color-copper: #c9573d;
+  --color-copper-soft: #ea8a70;
+
+  --color-ok: #5fc192;
+  --color-warn: #ddaa55;
+  --color-bad: #f07065;
+  --color-info: #7cabd3;
+
+  --accent: #c9573d;
+  --line: #2b332e;
+  --line-strong: #3c4640;
+  --sidebar-bg: #161a18;
+  --topbar-bg: rgb(22 26 24 / 0.9);
+  --panel-shadow: rgb(0 0 0 / 0.35);
 }
 
 html,
@@ -97,7 +137,7 @@ body {
 .glass {
   background: var(--color-ink-900);
   border: 1px solid var(--line);
-  box-shadow: 0 12px 40px rgb(39 45 36 / 0.045);
+  box-shadow: 0 12px 40px var(--panel-shadow);
 }
 
 /* v1 leftovers, neutralised */
@@ -107,8 +147,8 @@ body {
 .text-energy { color: var(--color-copper-soft); }
 
 .workspace-main { background: var(--color-ink-950); }
-.app-sidebar { background: #fbfaf6; }
-.app-topbar { background: rgb(251 250 246 / 0.91); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.app-sidebar { background: var(--sidebar-bg); }
+.app-topbar { background: var(--topbar-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .app-nav-item[aria-current='page'] { font-weight: 650; }
 .app-nav-item[aria-current='page']::before { content: ''; position: absolute; left: -12px; top: 7px; bottom: 7px; width: 3px; border-radius: 0 4px 4px 0; background: var(--color-copper); }
 .page-kicker { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--color-copper-soft); }

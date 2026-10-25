@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, CalendarDays, MessagesSquare, CircleCheck } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { LogoMark, Wordmark } from '@/components/Logo'
+import { ThemeToggle } from '@/components/shell/Topbar'
 
 const stops = [
   { n: '01', icon: CalendarDays, title: 'Plan the thing', detail: 'Events, budgets, and the details in between.' },
@@ -38,6 +39,7 @@ export default function StudentLogin() {
 
   return (
     <main className="grid h-full overflow-y-auto bg-ink-950 lg:grid-cols-[minmax(0,1.08fr)_minmax(420px,.92fr)]">
+      <div className="fixed right-4 top-4 z-20"><ThemeToggle /></div>
       <section className="relative order-last flex min-h-[380px] flex-col overflow-hidden bg-[#1f302c] px-7 py-7 text-[#f8f5ed] sm:px-12 lg:order-first lg:min-h-full lg:px-[clamp(48px,6vw,112px)] lg:py-12">
         <div className="flex items-center gap-3">
           <LogoMark size={29} />

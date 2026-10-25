@@ -3,13 +3,14 @@ import { useLocation } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { ChevronDown, Gauge, RotateCcw, Sparkles, LogOut } from 'lucide-react'
+import { ChevronDown, Gauge, Moon, RotateCcw, Sparkles, Sun, LogOut } from 'lucide-react'
 import { NAV, sectionFromPath } from '@/lib/nav'
 import { useAuth } from '@/lib/auth'
 import { useClub } from '@/lib/club'
 import { demo } from '@/lib/api'
 import { keys } from '@/lib/queryClient'
 import { useQuality } from '@/lib/motion'
+import { useTheme } from '@/lib/theme'
 import { Avatar } from '@/components/ui/Avatar'
 import { toast } from '@/components/ui/Toast'
 import { ClubSwitcher } from '@/components/shell/Sidebar'
@@ -56,6 +57,24 @@ function AiButton() {
         </Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>
+  )
+}
+
+export function ThemeToggle({ className }) {
+  const { theme, toggle } = useTheme()
+  const dark = theme === 'dark'
+  return (
+    <button
+      onClick={toggle}
+      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={dark ? 'Light mode' : 'Dark mode'}
+      className={
+        className ??
+        'grid size-8 place-items-center rounded-lg border border-line-strong bg-ink-850 text-muted transition-colors hover:bg-ink-800 hover:text-fg'
+      }
+    >
+      {dark ? <Sun className="size-4" aria-hidden /> : <Moon className="size-4" aria-hidden />}
+    </button>
   )
 }
 
@@ -132,6 +151,7 @@ export function Topbar() {
         <h1 className="truncate font-medium text-fg">{title}</h1>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        <ThemeToggle />
         <div className="hidden sm:block"><AiButton /></div>
         <UserMenu />
       </div>
