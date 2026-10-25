@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -12,14 +13,17 @@ import { useQuality } from '@/lib/motion'
 import { Avatar } from '@/components/ui/Avatar'
 import { toast } from '@/components/ui/Toast'
 import { ClubSwitcher } from '@/components/shell/Sidebar'
+import { AssistantPanel } from '@/components/assistant/AssistantPanel'
 
 function AiButton() {
   const { clubId, api } = useClub()
+  const [open, setOpen] = useState(false)
   const status = useQuery({ queryKey: keys.agentStatus(clubId), queryFn: api.agent.status, staleTime: 60_000 })
   const available = status.data?.available === true
 
   const button = (
     <button
+      onClick={() => setOpen(true)}
       disabled={!available}
       className="inline-flex h-8 items-center gap-2 rounded-lg border border-line-strong bg-ink-850 px-3 text-[13px] text-fg transition-colors hover:bg-ink-800 disabled:cursor-not-allowed disabled:text-faint disabled:hover:bg-ink-850"
     >
@@ -29,7 +33,13 @@ function AiButton() {
     </button>
   )
 
-  if (available) return button
+  if (available) return (
+    <>
+      {button}
+      {/* keyed by club so each club gets its own conversation */}
+      <AssistantPanel key={clubId} open={open} onOpenChange={setOpen} />
+    </>
+  )
   return (
     <Tooltip.Root delayDuration={200}>
       <Tooltip.Trigger asChild>

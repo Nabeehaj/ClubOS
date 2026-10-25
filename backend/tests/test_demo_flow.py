@@ -143,26 +143,77 @@ def _stub_reply(*, calls=None, text=None):
                            candidates=[SimpleNamespace(content=types.Content(role="model", parts=parts))])
 
 
-def test_agent_proposes_then_user_confirms(client, monkeypatch):
-    script = iter([
-        _stub_reply(calls=[types.FunctionCall(name="member_workload", args={})]),
-        _stub_reply(calls=[types.FunctionCall(name="propose_create_task", args={
-            "title": "Book a photographer", "assignee_id": 6, "event_id": 1, "priority": "High",
-            "due_date": "2026-11-01"})]),
-        _stub_reply(text="I proposed a task for Daniel. Confirm it below!"),
-    ])
-    monkeypatch.setattr(ai, "generate", lambda contents, cfg: next(script))
-    h, _ = login(client, "sarah")
-    out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "Who can book a photographer?"}).json()
-    assert out["tools_used"] == ["member_workload", "propose_create_task"]
-    proposal = out["proposals"][0]
-    assert proposal["status"] == "Proposed" and "Daniel Lee" in proposal["summary"]
+def _script(monkeypatch, *replies):
+    it = iter(replies)
+    monkeypatch.setattr(ai, "generate", lambda contents, cfg: next(it))
 
-    tasks_before = len(client.get("/api/clubs/1/tasks", headers=h).json())
-    done = client.post(f"/api/clubs/1/agent/actions/{proposal['id']}/confirm", headers=h).json()
-    assert done["task"]["title"] == "Book a photographer" and done["task"]["assignee"]["name"] == "Daniel Lee"
-    assert len(client.get("/api/clubs/1/tasks", headers=h).json()) == tasks_before + 1
-    assert client.post(f"/api/clubs/1/agent/actions/{proposal['id']}/confirm", headers=h).status_code == 409
+
+def _call(name, **args):
+    return types.FunctionCall(name=name, args=args)
+
+
+def test_agent_plans_event_and_confirm_all(client, monkeypatch):
+    _script(monkeypatch,
+            _stub_reply(calls=[_call("get_event", event_id=2), _call("member_workload")]),
+            _stub_reply(calls=[_call("propose_create_tasks", tasks=[
+                {"title": "Book a photographer", "assignee_id": 6, "event_id": 2, "due_date": "2026-11-08"},
+                {"title": "Print name tags", "assignee_id": 4, "event_id": 2, "priority": "Low"},
+                {"title": "Bad one", "assignee_id": 999}])]),
+            _stub_reply(text="I proposed 2 tasks for the AI Workshop."))
+    h, _ = login(client, "sarah")
+    out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "Plan the AI Workshop"}).json()
+    assert out["tools_used"] == ["get_event", "member_workload", "propose_create_tasks"]
+    assert len(out["proposals"]) == 2 and "Daniel Lee" in out["proposals"][0]["summary"]
+    assert all(p["can_confirm"] and p["requires_role"] is None for p in out["proposals"])
+
+    before = len(client.get("/api/clubs/1/tasks?event_id=2", headers=h).json())
+    ids = [p["id"] for p in out["proposals"]]
+    done = client.post("/api/clubs/1/agent/actions/confirm", headers=h, json={"action_ids": ids}).json()
+    assert done["applied"] == 2 and done["failed"] == 0
+    assert len(client.get("/api/clubs/1/tasks?event_id=2", headers=h).json()) == before + 2
+    again = client.post("/api/clubs/1/agent/actions/confirm", headers=h, json={"action_ids": ids}).json()
+    assert again["failed"] == 2  # already applied
+
+
+def test_agent_bulk_update_delete_and_chat(client, monkeypatch):
+    h, _ = login(client, "sarah")
+    tasks = client.get("/api/clubs/1/tasks?assignee_id=6&status=To%20Do", headers=h).json()
+    assert tasks
+    victim = client.post("/api/clubs/1/tasks", headers=h, json={"title": "Temp task"}).json()
+    _script(monkeypatch,
+            _stub_reply(calls=[_call("propose_update_tasks", updates=[{"task_id": t["id"], "status": "Completed"}
+                                                                       for t in tasks]),
+                               _call("propose_delete_tasks", task_ids=[victim["id"]]),
+                               _call("propose_post_message", channel_name="general", body="Daniel wrapped up!")]),
+            _stub_reply(text="Done proposing."))
+    out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "Mark Daniel's to-dos done"}).json()
+    kinds = sorted(p["kind"] for p in out["proposals"])
+    assert kinds == sorted(["update_task"] * len(tasks) + ["delete_task", "post_message"])
+    done = client.post("/api/clubs/1/agent/actions/confirm", headers=h,
+                       json={"action_ids": [p["id"] for p in out["proposals"]]}).json()
+    assert done["failed"] == 0
+    assert not client.get("/api/clubs/1/tasks?assignee_id=6&status=To%20Do", headers=h).json()
+    assert client.get(f"/api/clubs/1/tasks/{victim['id']}", headers=h).status_code == 404
+    general = client.get("/api/clubs/1/channels", headers=h).json()[0]
+    assert general["last_message"]["body"] == "Daniel wrapped up!" and general["last_message"]["is_bot"]
+
+
+def test_agent_money_needs_finance_role(client, monkeypatch):
+    proposal_calls = [_call("propose_add_expense", category_id=2, description="Pizza deposit", amount=80, event_id=1),
+                      _call("propose_advance_approval", system="sb_engaged", record_id=2)]
+    _script(monkeypatch, _stub_reply(calls=proposal_calls), _stub_reply(text="Proposed."))
+    h, _ = login(client, "daniel")  # Marketing Chair
+    out = client.post("/api/clubs/1/agent/chat", headers=h, json={"message": "log pizza, push SBE"}).json()
+    expense = next(p for p in out["proposals"] if p["kind"] == "add_expense")
+    step = next(p for p in out["proposals"] if p["kind"] == "advance_approval")
+    assert expense["can_confirm"] is False and expense["requires_role"]
+    assert step["can_confirm"] is True
+    assert client.post(f"/api/clubs/1/agent/actions/{expense['id']}/confirm", headers=h).status_code == 403
+    assert client.post(f"/api/clubs/1/agent/actions/{step['id']}/confirm", headers=h).json()["record"]["status"]         == "Pending"
+
+    h, _ = login(client, "emily")  # Treasurer can confirm the same card
+    done = client.post(f"/api/clubs/1/agent/actions/{expense['id']}/confirm", headers=h).json()
+    assert done["expense"]["amount"] == 80 and done["budget"]["spent"] > 0
 
 
 def test_demo_reset(client):

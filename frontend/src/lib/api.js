@@ -189,6 +189,7 @@ export function clubApi(clubId) {
       status: () => get(`${base}/agent/status`),
       chat: (message, history = []) => post(`${base}/agent/chat`, { message, history }),
       confirm: (actionId) => post(`${base}/agent/actions/${actionId}/confirm`),
+      confirmMany: (actionIds) => post(`${base}/agent/actions/confirm`, { action_ids: actionIds }), // { results, applied, failed }
       reject: (actionId) => post(`${base}/agent/actions/${actionId}/reject`),
     },
   }
