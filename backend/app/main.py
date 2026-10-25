@@ -2,6 +2,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 
@@ -42,6 +43,11 @@ app.add_middleware(
 
 for r in (auth, clubs, dashboard, events, tasks, chat, approvals, finance, vendors, emails, agent):
     app.include_router(r.router)
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/docs")
 
 
 @app.get("/api/health", tags=["system"])

@@ -8,7 +8,7 @@ FastAPI + SQLite (SQLModel), JWT auth, Gemini for the AI features.
 cd backend
 python -m venv .venv
 .venv\Scripts\activate             # Mac/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 copy .env.example .env             # Mac/Linux: cp .env.example .env, then add GEMINI_API_KEY
 uvicorn app.main:app --reload
 ```
@@ -47,3 +47,9 @@ tests/
 - Import the real club data from CSV
 - `@clubos` mentions in chat
 - Deployment
+
+## Hosting (Vercel)
+
+The backend deploys to Vercel from `main` (project root directory: `backend`). Every push to `main`
+redeploys automatically. Set `JWT_SECRET` and, to enable AI, `GEMINI_API_KEY` in the Vercel project's
+environment variables. The demo database lives in `/tmp` on Vercel and resets when the server restarts.
